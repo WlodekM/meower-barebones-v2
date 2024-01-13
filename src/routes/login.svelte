@@ -1,21 +1,55 @@
+<script>
+    import { sendDirect, sendCmd } from "@/lib/cl"
+    import { goto } from "@roxi/routify"
+    import { isLoggedIn, isGuest, user } from "@/lib/stores.js"
+    let username, password
+    let passwordShown = false
+</script>
 
 <div class="center-vert" style="height: 100vh;">
     <div class="container center" style="max-width: 400px;">
         <div class="title">
             Login
         </div>
-        <form class="form left" style="width: 100%;" id="loginForm">
+        <form class="form left" style="width: 100%;" id="loginForm" on:submit={(e)=>{
+            e.preventDefault();
+            if (!username) return
+            $user.username = username
+            $isGuest = password == undefined
+            $isLoggedIn = true
+            if (!$isGuest) {
+                sendCmd("authpswd", {
+                    "username": username,
+                    "pswd": password,
+                })
+                $goto("/")
+            } else {
+                $isLoggedIn = true
+                $goto("/")
+            }
+        }}>
             <div class="form-section">
                 <span>
                     Username:
                 </span>
-                <input type="text" name="username" id="username">
+                <input type="text" name="username" id="username" bind:value={username}>
             </div>
             <div class="form-section">
                 <span>
                     Password <i>(optional)</i>:
                 </span>
-                <input type="password" name="password" id="password" style="margin-inline: auto;">
+                <!-- im too lazy to fix this propperly so -->
+                {#if !passwordShown}
+                    <input type="password" name="password" id="password" bind:value={password}>
+                {:else}
+                    <input type="text" name="password" id="password" bind:value={password}>
+                {/if}
+            </div>
+            <div class="form-section">
+                <span style="text-align: left!important;">
+                    Show password
+                </span>
+                <input type="checkbox" name="Show password" id="showpass" bind:checked={passwordShown}>
             </div>
             <input type="submit" value="Log in">
         </form>

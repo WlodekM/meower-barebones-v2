@@ -1,7 +1,10 @@
 <script>
 
     import { apiUrl } from '@/lib/urls.js'
-    import { cl } from '@/lib/cl.js'
+    import { cl, sendCmd, sendDirect } from '@/lib/cl.js'
+	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
+    import { goto } from "@roxi/routify"
+    if(!$isLoggedIn) {$goto("/login")}
     const path = '/home?autoget'
 
 	// PagedList stuff
@@ -56,6 +59,7 @@
         }
 		return post
 	}
+	let postContent
 	console.log(posts)
 </script>
 
@@ -71,8 +75,23 @@
 </div>
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
-    <textarea rows="4" class="type-message"></textarea>
-    <button id="postbutton">Post!</button>
+    <textarea rows="4" class="type-message" bind:this={postContent}></textarea>
+    <button id="postbutton" on:click={()=>{
+		console.log("hi mom")
+		if ($isGuest) {
+			fetch('https://webhooks.meower.org/post/home', {
+				method: 'POST',
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ "post": postContent.value, "username": $user.username })
+			})
+				.then(response => response.text())
+		} else {
+			sendCmd("post_home", postContent.value)
+		}
+	}}>Post!</button>
 </div>
 
 <div id="posts">
