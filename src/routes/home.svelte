@@ -3,6 +3,7 @@
     import { apiUrl } from '@/lib/urls.js'
     import { sendCmd, meowerRequest, link } from '@/lib/clm.js'
 	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
+    import Topbar from "@/lib/Topbar.svelte";
     import { goto } from "@roxi/routify"
     import Post from "@/lib/Post.svelte";
     if(!$isLoggedIn) {$goto("/login")}
@@ -67,6 +68,8 @@
 	console.log(posts)
 	let postError = ""
 </script>
+
+<Topbar />
 
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
