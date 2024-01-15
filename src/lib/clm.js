@@ -10,7 +10,8 @@ export let status = null;
  * The single CloudLink instance used by the manager.
  */
 export const link = new Cloudlink();
-link.connect(linkUrl)
+export let connected = false
+connect()
 // @ts-ignore
 window.cljs = link;
 
@@ -59,6 +60,7 @@ function connect() {
     link.on("connected", () => {
         // disconnected.set(false);
         // attemptedAutoReconnect.set(false);
+        connected = true
         setInterval(() => {
             link.send({cmd: "ping", val: ""});
         }, 10000);
@@ -66,6 +68,7 @@ function connect() {
 	link.once("connectionstart", () => {
         //...
     });
+    link.connect(linkUrl)
 }
 
 // cl.onmessage = (event) => {
@@ -81,9 +84,11 @@ function connect() {
 
 link.on("disconnect", (e) => {
     isLoggedIn.set(false)
+    connected = false
 })
 
 export function sendCmd(cmd, val) {
+    if(!connected) connect()
     console.log({
         "cmd": "direct",
         "val": {
