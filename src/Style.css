@@ -29,27 +29,6 @@ input, button, textarea {
     margin-bottom: 0;
 }
 
-.top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: hsl(0, 0%, 25%);
-}
-
-.top h1 {
-    cursor: pointer;
-    padding-inline: 8px;
-    padding-block-start: 0.67em;
-    padding-block-end: 0.67em;
-    height: 100%;
-    margin: 0;
-    transition: background 0.5s;
-}
-
-.top h1:hover {
-    background: rgba(255, 255, 255, 0.25);
-}
-
 .container {
     border-radius: 5px;
     border: 2px rgba(255, 255, 255, 0.2) solid;

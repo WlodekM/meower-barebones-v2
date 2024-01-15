@@ -68,16 +68,6 @@
 	let postError = ""
 </script>
 
-<div class="top">
-    <h1 id="logo">Meower Barebones</h1>
-    <div id="controls">
-        {$isLoggedIn}
-        <!-- <div id=spacer style="width:25px;"></div> -->
-        <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
-        <div id="spacer" style="width:50px;"></div>
-        <button id="reload">Reload</button>
-    </div>
-</div>
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
     <textarea rows="4" class="type-message" bind:this={postContent}></textarea>
