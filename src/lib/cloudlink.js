@@ -29,6 +29,8 @@
 
 import sleep from "./sleep.js";
 import {apiUrl} from "./urls.js";
+//...
+export const ssr = false;
 
 /**
  * A callback type used for packet events.
