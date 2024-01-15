@@ -126,6 +126,9 @@ button, textarea {
     background: rgb(43, 42, 51);
     border: rgb(117, 116, 122) 2px solid;
     border-radius: 7.5px;
+}
+
+button {
     cursor: pointer;
 }
 

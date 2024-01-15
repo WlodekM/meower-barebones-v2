@@ -1,9 +1,10 @@
 <script>
-    import { sendDirect, sendCmd } from "@/lib/cl"
+    import { sendCmd } from "@/lib/clm"
     import { goto } from "@roxi/routify"
     import { isLoggedIn, isGuest, user } from "@/lib/stores.js"
     let username, password
     let passwordShown = false
+    $: type = passwordShown ? 'text' : 'password'
 </script>
 
 <div class="center-vert" style="height: 100vh;">
@@ -38,12 +39,7 @@
                 <span>
                     Password <i>(optional)</i>:
                 </span>
-                <!-- im too lazy to fix this propperly so -->
-                {#if !passwordShown}
-                    <input type="password" name="password" id="password" bind:value={password}>
-                {:else}
-                    <input type="text" name="password" id="password" bind:value={password}>
-                {/if}
+                <input { type } name="password" id="password" on:input={(event)=>{password = event.target.value}}>
             </div>
             <div class="form-section">
                 <span style="text-align: left!important;">

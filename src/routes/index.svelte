@@ -1,7 +1,7 @@
 <script>
 
     import { apiUrl } from '@/lib/urls.js'
-    import { cl, sendCmd, sendDirect } from '@/lib/cl.js'
+    import { sendCmd, meowerRequest, link } from '@/lib/clm.js'
 	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
     import { goto } from "@roxi/routify"
     if(!$isLoggedIn) {$goto("/login")}
@@ -9,7 +9,7 @@
 
 	// PagedList stuff
 	let list;
-	export let items = [];
+	let items = [];
 
 	/**
 	 * Loads posts
@@ -32,20 +32,22 @@
 	 */
     let posts = []
 	loadPosts().then((aa)=>{
+		//@ts-ignore
 		posts = aa
 	})
-    cl.onmessage = (event) => {
-        console.log(event.data);
-        if (JSON.parse(event.data)["val"]["post_origin"]) {
+    link.on("direct", (cmd) => {
+		if (!cmd.val) return;
+        // console.log(`h`, cmd.val);
+        if (cmd.val["post_origin"]) {
 			// svelte moment
-			console.log("its a post!!!111", JSON.parse(event.data)["val"])
+			console.log("its a post!!!111", cmd.val)
 			//TODO - Rename this var
 			let temp = posts
-            temp.unshift(JSON.parse(event.data)["val"])
+            temp.unshift(cmd.val)
 			posts = temp
 			console.log(posts)
         }
-    };
+    });
 	function postsMapThing(post) {
 		const badges = {
 			"Discord": "Bridged",
@@ -57,16 +59,18 @@
             post.u = `${post.p.split(":")[0]} <badge>${String(badges[post.u]).toUpperCase()}</badge>`
             post.p = post.p.split(":").slice(1).join(":")
         }
+		post.p.replaceAll("\n", "<br>")
 		return post
 	}
 	let postContent
 	console.log(posts)
+	let postError = ""
 </script>
 
 <div class="top">
     <h1 id="logo">Meower Barebones</h1>
     <div id="controls">
-        <input type="text" id="username" value="Username" />
+        {$isLoggedIn}
         <!-- <div id=spacer style="width:25px;"></div> -->
         <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
         <div id="spacer" style="width:50px;"></div>
@@ -88,8 +92,12 @@
 				body: JSON.stringify({ "post": postContent.value, "username": $user.username })
 			})
 				.then(response => response.text())
+			postContent.value = ""
 		} else {
-			sendCmd("post_home", postContent.value)
+			sendCmd("post_home", postContent.value).catch((err) => {
+				postError = `Error when posting: "${err}"`
+			})
+			postContent.value = ""
 		}
 	}}>Post!</button>
 </div>
