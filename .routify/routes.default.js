@@ -16,6 +16,20 @@ export default {
   "routifyDir": import.meta.url,
   "children": [
     {
+      "meta": {},
+      "id": "_default_home_svelte",
+      "name": "home",
+      "file": {
+        "path": "src/routes/home.svelte",
+        "dir": "src/routes",
+        "base": "home.svelte",
+        "ext": ".svelte",
+        "name": "home"
+      },
+      "asyncModule": () => import('../src/routes/home.svelte'),
+      "children": []
+    },
+    {
       "meta": {
         "isDefault": true
       },

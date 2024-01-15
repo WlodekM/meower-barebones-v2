@@ -50,7 +50,6 @@ input, button, textarea {
     background: rgba(255, 255, 255, 0.25);
 }
 
-.post,
 .container {
     border-radius: 5px;
     border: 2px rgba(255, 255, 255, 0.2) solid;
@@ -85,18 +84,6 @@ input, button, textarea {
 
 .left {
     text-align: left;
-}
-
-.post {
-    padding: 4px;
-    margin-top: 10px;
-}
-
-.post img {
-    width: 150px;
-    height: auto;
-    border-radius: 5px;
-    border: 1px rgba(255, 255, 255, 0.1) solid;
 }
 
 #username {
