@@ -11,11 +11,11 @@ export default defineConfig({
     clearScreen: false,
     resolve: { alias: { '@': resolve('src') } },
     plugins: [
-        routify({ ssr: { enable: production } }),
+        routify({ ssr: {disable: true, enable: false} }),
         svelte({
             compilerOptions: {
                 dev: !production,
-                hydratable: !!process.env.ROUTIFY_SSR_ENABLE,
+                // hydratable: !!process.env.ROUTIFY_SSR_ENABLE,  //nuh uh
             },
             extensions: ['.md', '.svelte'],
             preprocess: [mdsvex({ extension: 'md' })],
