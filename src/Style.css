@@ -1,7 +1,20 @@
+:root {
+    --secondary-bg: #2b2a33;
+    --background: #1c1b22;
+    --foreground: #fff;
+    --bg-light: #3c3b42;
+    --border: #75747a;
+}
+
 body {
     font-family: 'Comic Sans', 'Comic Sans MS';
+    background: var(--background);
     margin: 0;
     min-height: 100vh;
+}
+
+* {
+    color: var(--foreground);
 }
 
 input, button, textarea {
@@ -31,8 +44,9 @@ input, button, textarea {
 
 .container {
     border-radius: 5px;
-    border: 2px rgba(255, 255, 255, 0.2) solid;
-    padding: 5px;
+    background:    var(--secondary-bg);
+    padding:       5px;
+    border:        2px var(--border) solid;
 }
 
 .form-section {
@@ -81,17 +95,17 @@ input, button, textarea {
     align-items: center;
 }
 
-badge {
+badge, .badge {
     background: #7b7b7b;
     border-radius: 10px;
     padding: 1px;
     padding-inline: 5px;
 }
 
-button, textarea {
-    background: rgb(43, 42, 51);
-    border: rgb(117, 116, 122) 2px solid;
-    border-radius: 7.5px;
+button, textarea, input {
+    background: var(--secondary-bg);
+    border: var(--border) 2px solid;
+    border-radius: 5px;
 }
 
 button {
@@ -99,5 +113,5 @@ button {
 }
 
 button:hover, textarea:hover {
-    background: rgb(61, 59, 73);
+    background: var(--bg-light);
 }
