@@ -16,7 +16,7 @@
             e.preventDefault();
             if (!username) return
             $user.username = username
-            $isGuest = password == undefined
+            $isGuest = !password
             $isLoggedIn = true
             if (!$isGuest) {
                 sendCmd("authpswd", {

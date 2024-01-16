@@ -1,18 +1,26 @@
 <script>
 	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
+    import { goto } from "@roxi/routify";
 </script>
 <div class="top">
     <h1 id="logo">Meower Barebones</h1>
     <div id="controls">
         {#if $isLoggedIn}
             Logged in as {$user.username}
+            {#if $isGuest}
+                (Guest)
+            {/if}
         {:else}
             <span color="red">Not logged in</span>
         {/if}
         <!-- <div id=spacer style="width:25px;"></div> -->
         <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
         <div id="spacer" style="width:50px;"></div>
-        <button id="reload">Reload</button>
+        <button on:click={()=>{
+            $isLoggedIn = false;
+            $isGuest = false;
+            $goto("/login")
+        }}>Log out</button>
     </div>
 </div>
 
