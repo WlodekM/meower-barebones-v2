@@ -5,3 +5,4 @@ export let isGuest = writable(false);
 export let user = writable({
     username: ""
 });
+export let ulist = writable([])

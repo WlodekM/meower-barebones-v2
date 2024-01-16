@@ -1,6 +1,7 @@
 <script>
     // import marked from "marked";
 	import MarkdownIt from "markdown-it";
+    import Container from "@/lib/Container.svelte";
     export let post;
 
     // yoink
@@ -112,11 +113,15 @@
 		return renderedContent;
 	}
 </script>
-
-<div class="post" id="{post["post_id"]}">
-    <span id=username>
+<div class="post container">
+    <div class="post-header">
         {@html post.u}
-    </span>
+        {#if post.p.endsWith(" ")}
+            <span class="badge">
+                Barebones
+            </span>
+        {/if}
+    </div>
     <p>
         <!-- {@html marked(post.p)} -->
         {#await addFancyElements(post.p) then content}
@@ -128,17 +133,13 @@
 
 <style>
     .post {
-        padding: 4px;
         margin-top: 10px;
-        border-radius: 5px;
-        border: 2px rgba(255, 255, 255, 0.2) solid;
-        padding: 5px;
     }
 
-    .post img {
+    /* .post div img {
         width: 150px;
         height: auto;
         border-radius: 5px;
         border: 1px rgba(255, 255, 255, 0.1) solid;
-    }
+    } */
 </style>
