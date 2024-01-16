@@ -1,7 +1,7 @@
-import { isGuest, user, isLoggedIn } from './stores.js'
+import { isGuest, ulist, isLoggedIn } from './stores.js'
 import { linkUrl } from "./urls.js";
+import { writable } from "svelte/store";
 import Cloudlink from "./cloudlink.js";
-import {writable} from "svelte/store";
 export let isWaitingForStatus = writable(false);
 export let status = null;
 
@@ -67,6 +67,14 @@ function connect() {
     });
 	link.once("connectionstart", () => {
         //...
+    });
+    link.on("ulist", cmd => {
+        console.log("ulist", cmd.val)
+        const _ulist = cmd.val.split(";");
+        if (_ulist[_ulist.length - 1] === "") {
+            _ulist.pop();
+        }
+        ulist.set(_ulist);
     });
     link.connect(linkUrl)
 }

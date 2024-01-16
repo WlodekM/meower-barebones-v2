@@ -2,12 +2,17 @@
 
     import { apiUrl } from '@/lib/urls.js'
     import { sendCmd, meowerRequest, link } from '@/lib/clm.js'
-	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
+	import { isGuest, user, isLoggedIn, ulist } from '@/lib/stores.js'
     import Topbar from "@/lib/Topbar.svelte";
+	//@ts-ignore
     import { goto } from "@roxi/routify"
+	import Container from "@/lib/Container.svelte";
     import Post from "@/lib/Post.svelte";
     if(!$isLoggedIn) {$goto("/login")}
     const path = '/home?autoget'
+	function deleteFromArray(array, index) {
+		array.splice(index, 1)
+	}
 
 	// PagedList stuff
 	let list;
@@ -50,6 +55,14 @@
 			console.log(posts)
         }
     });
+    link.on("direct", (cmd) => {
+		console.log("direct", cmd)
+		if (cmd.val.mode != "delete") return;
+        // console.log(`h`, cmd.val);
+        let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
+		console.log(`delete post #${postID} (${cmd.val.id})\n`, "object:", posts[postID])
+		deleteFromArray(posts, postID)
+    });
 	function postsMapThing(post) {
 		const badges = {
 			"Discord": "Bridged",
@@ -70,10 +83,20 @@
 </script>
 
 <Topbar />
+<div class="margin" style="margin-top: 8px;">
+	<Container>
+		<h1 style="margin: 0;margin-bottom: 8px;">Home</h1>
+		There are {$ulist.length} users online
+		<br>
+		{#each $ulist as user}
+			<span>{user}, </span>
+		{/each}
+	</Container>
+</div>
 
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
-    <textarea rows="4" class="type-message" bind:this={postContent}></textarea>
+    <textarea rows="2" class="type-message" bind:this={postContent}></textarea>
     <button id="postbutton" on:click={()=>{
 		console.log("hi mom")
 		if ($isGuest) {
@@ -83,12 +106,12 @@
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ "post": postContent.value, "username": $user.username })
+				body: JSON.stringify({ "post": postContent.value + " ", "username": $user.username })
 			})
 				.then(response => response.text())
 			postContent.value = ""
 		} else {
-			sendCmd("post_home", postContent.value).catch((err) => {
+			sendCmd("post_home", postContent.value + " ").catch((err) => {
 				postError = `Error when posting: "${err}"`
 			})
 			postContent.value = ""
@@ -101,3 +124,9 @@
         <Post post={post} />
 	{/each}
 </div>
+
+<style>
+	.margin {
+		margin-inline: 8px;
+	}
+</style>
