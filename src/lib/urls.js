@@ -10,6 +10,10 @@
 export const ssr = false;
 export const debug = false
 
+if(!localStorage) {
+	const localStorage = {getItem: ()=>{}}
+}
+
 export const linkUrl =
 	localStorage.getItem("meower_linkurl") || (debug ? "wss://server.meower.eu.org/" : "wss://api.meower.org/v0/cloudlink/");
 export const apiUrl =
