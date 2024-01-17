@@ -1,57 +1,221 @@
 /**
  * @file MDwalters parser real]
  */
-//NOTE - Unused, use markedjs instead
-//=== simple markdown parser
-export function simpleMarkdown(mdText) {
-    // first, handle syntax for code-block
-    mdText = mdText.replace(/\r\n/g, '\n')
-    mdText = mdText.replace(/\n~~~ *(.*?)\n([\s\S]*?)\n~~~/g, '<pre><code title="$1">$2</code></pre>' )
-    mdText = mdText.replace(/\n``` *(.*?)\n([\s\S]*?)\n```/g, '<pre><code title="$1">$2</code></pre>' )
-    // split by "pre>", skip for code-block and process normal text
-    let mdHTML = ''
-    let mdCode = mdText.split( 'pre>')
-    for (let i=0; i<mdCode.length; i++) {
-        if ( mdCode[i].substr(-2) == '</' ) {
-            mdHTML += '<pre>' + mdCode[i] + 'pre>'
-        } else {
-            mdHTML += mdCode[i].replace(/(.*)<$/, '$1')
-            .replace(/^\*\*\*\*/gm,"\\*\\*\\*\\*")
-            .replace (/^##### (.*?)\s*#*$/gm, '<h5>$1</h5>')
-            .replace(/^#### (.*?)\s*#*$/gm, '<h4 id="$1">$1</h4>')
-            .replace(/^### (.*?)\s*#*$/gm, '<h3 id="$1">$1</h3>')
-            .replace(/^## (.*?)\s*#*$/gm, '<h2 id="$1">$1</h2>')
-            .replace(/^# (.*?)\s*#*$/gm, '<h1 id="$1">$1</h1>')
-            // .replace(/^-{3,}|^\_{3,}|^\*{3,}/gm, '<hr/>')
-            .replace(/``(.*?)``/gm, '<code>$1</code>' )
-            .replace(/`(.*?)`/gm, '<code>$1</code>' )
-            .replace(/^\>> (.*$)/gm, '<blockquote><blockquote>$1</blockquote></blockquote>')
-            .replace(/^\> (.*$)/gm, '<blockquote>$1</blockquote>')
-            .replace(/<\/blockquote\>\n<blockquote\>/g, '\n<br>' )
-            .replace(/<\/blockquote\>\n<br\><blockquote\>/g, '\n<br>' )
-            .replace(/!\[(.*?)\]\((.*?) "(.*?)"\)/gm, '<img alt="$1" src="$2" $3 />')
-            .replace(/!\[(.*?)\]\((.*?)\)/gm, '<img alt="$1" src="$2" />')
-            .replace(/\[(.*?)\]\((.*?) "(.*?)"\)/gm, '<a href="$2" title="$3">$1</a>')
-            .replace(/<http(.*?)\>/gm, '<a href="http$1">http$1</a>')
-            .replace(/\[(.*?)\]\(\)/gm, '<a href="$1">$1</a>')
-            .replace(/\[(.*?)\]\((.*?)\)/gm, '<a href="$2">$1</a>')
-            .replace(/^[\*|+|-][ |.](.*)/gm, '<ul><li>$1</li></ul>' ).replace(/<\/ul\>\n<ul\>/g, '\n' )
-            .replace(/^\d[ |.](.*)/gm, '<ol><li>$1</li></ol>' ).replace(/<\/ol\>\n<ol\>/g, '\n' )
-            .replace(/\*\*\*(.*)\*\*\*/gm, '<b><em>$1</em></b>')
-            .replace(/\*\*(.*)\*\*/gm, '<b>$1</b>')
-            .replace(/\*([\w \d]*)\*/gm, '<em>$1</em>')
-            .replace(/___(.*)___/gm, '<b><em>$1</em></b>')
-            .replace(/__(.*)__/gm, '<u>$1</u>')
-            .replace(/_([\w \d]*)_/gm, '<em>$1</em>')
-            .replace(/~~(.*)~~/gm, '<del>$1</del>')
-            .replace(/\^\^(.*)\^\^/gm, '<ins>$1</ins>')
-            .replace(/ +\n/g, '\n<br/>')
-            .replace(/\n\s*\n/g, '\n<p>\n')
-            .replace(/^ {4,10}(.*)/gm, '<pre><code>$1</code></pre>' )
-            .replace(/^\t(.*)/gm, '<pre><code>$1</code></pre>' )
-            .replace(/<\/code\><\/pre\>\n<pre\><code\>/g, '\n' )
-            .replace(/\\([`_\\\*\+\-\.\(\)\[\]\{\}])/gm, '$1' )
-        }
+//NOTE - No, i didnt steal this from roarer, what are you talking about?
+//@ts-ignore
+import hljs from "highlight.js";
+import "highlight.js/styles/github-dark.css";
+import linkifyHtml from "linkify-html";
+import "linkify-plugin-mention";
+//@ts-ignore
+import markdownit from "markdown-it";
+//@ts-ignore
+import Token from "markdown-it/lib/token";
+// import { hostWhitelist } from "../lib/hostWhitelist";
+
+const ATTACHMENT_REGEX = /\[([^\]]+?): (?! )([^\]]+?)\]/;
+const DISCORD_REGEX = /<a?:(\w+):(\d+)>/;
+const IMAGE_REGEX = new RegExp(
+    ATTACHMENT_REGEX.source + "|" + DISCORD_REGEX.source,
+    "g",
+    );
+    
+    export const markdown = markdownit({
+        breaks: true,
+        highlight(str, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                return hljs.highlight(str, { language: lang }).value;
+            }
+    return "";
+},
+});
+
+const toHTML = (md, inline) => {
+  const tokens = inline ? markdown.parseInline(md, {}) : markdown.parse(md, {});
+  const newTokens = [];
+  tokens.forEach((token) => {
+    if (token.type !== "inline" || !token.children) {
+      newTokens.push(token);
+      return;
     }
-    return mdHTML.trim()
-}
+    const newChildren = [];
+    token.children.forEach((child) => {
+      if (child.type !== "text") {
+        newChildren.push(child);
+        return;
+      }
+      const content = child.content;
+      const images = [...content.matchAll(IMAGE_REGEX)];
+      if (images.length === 0) {
+        newChildren.push(child);
+        return;
+      }
+      const newTextTokens = [];
+      const matches = images.map(
+        (image) =>
+          ({
+            originalMatch: image,
+            specificMatch:
+              image[0].match(ATTACHMENT_REGEX) ??
+              image[0].match(DISCORD_REGEX) ??
+              (() => {
+                throw new Error("this can't happen");
+              })(),
+          }),
+      );
+      matches.forEach(({ originalMatch, specificMatch }, i) => {
+        const index = originalMatch.index;
+        if (index === undefined) {
+          return;
+        }
+        const beforeText = content.slice(0, index).replace(IMAGE_REGEX, "");
+        const beforeTextToken = new Token("text", "", 0);
+        beforeTextToken.content = beforeText;
+        newTextTokens.push(beforeTextToken);
+        const [fullMatch, alt, src] = specificMatch;
+        const imageToken = new Token("image", "", 0);
+        imageToken.content = alt;
+        imageToken.tag = "img";
+        imageToken.attrs = [
+          ["alt", ""],
+          [
+            "src",
+            fullMatch.startsWith("<")
+              ? `https://cdn.discordapp.com/emojis/${src}.${
+                  fullMatch.startsWith("a") ? "gif" : "webp"
+                }?size=32&quality=lossless`
+              : src,
+          ],
+          ["data-original", fullMatch],
+        ];
+        const altTextToken = new Token("text", "", 0);
+        altTextToken.content = alt;
+        imageToken.children = [altTextToken];
+        newTextTokens.push(imageToken);
+        if (i === images.length - 1) {
+          const afterText = content.slice(index + fullMatch.length);
+          const afterTextToken = new Token("text", "", 0);
+          afterTextToken.content = afterText;
+          newTextTokens.push(afterTextToken);
+        }
+      });
+      newChildren.push(...newTextTokens);
+    });
+    token.children = newChildren;
+    newTokens.push(token);
+  });
+  return markdown.renderer.render(tokens, markdown.options, {});
+};
+
+export async function parseMarkdown(
+  md,
+  {
+    inline = false,
+    images = true,
+    anyImageHost = false,
+    loadProjectText = "Load project",
+  },
+) {
+  const html = toHTML(md, inline);
+  const domParser = new DOMParser();
+  const postDocument = domParser.parseFromString(html, "text/html");
+  postDocument.querySelectorAll("img").forEach((img) => {
+    if (
+      !images ||
+      (!anyImageHost)
+    ) {
+      const span = document.createElement("span");
+      span.textContent = img.dataset.original || `![${img.src}](${img.alt})`;
+      img.replaceWith(span);
+      return;
+    }
+    if (img.dataset.original && !img.dataset.original.startsWith("<")) {
+      const clonedImg = img.cloneNode();
+      postDocument.body.append(clonedImg);
+      img.remove();
+    } else {
+      img.classList.add("inline-block");
+    }
+  });
+  const sanitizedHTML = postDocument.body.innerHTML;
+  // using the built in linkify feature of markdown-it would not allow the
+  // above change for images
+  const linkifiedHTML = linkifyHtml(sanitizedHTML, {
+    formatHref: {
+      mention: (href) => `https://app.meower.org/users${href}`,
+    },
+  });
+  const linkifiedDocument = domParser.parseFromString(
+    linkifiedHTML,
+    "text/html",
+  );
+  linkifiedDocument.querySelectorAll("a").forEach((element) => {
+    const text = element.textContent;
+    if (!text || !element.textContent?.startsWith("@")) {
+      return;
+    }
+    const user = text.slice(1);
+    element.href = `#/users/${user}`;
+  });
+  const doneProjectEmbeds = new Set();
+  const buttons = document.createElement("div");
+  buttons.className = "flex gap-2 flex-wrap";
+//   linkifiedDocument.querySelectorAll("a").forEach((element) => {
+//     if (inline) {
+//       return;
+//     }
+//     const link = element.href;
+//     if (link !== element.textContent) {
+//       return;
+//     }
+//     const match = link.match(
+//       /(?:https?:\/\/)?(scratch.mit.edu\/projects|turbowarp.org)\/(\d+)\/?/,
+//     );
+//     if (!match) {
+//       return;
+//     }
+//     const url = match[1];
+//     const projectId = match[2];
+//     if (doneProjectEmbeds.has(projectId)) {
+//       return;
+//     }
+//     doneProjectEmbeds.add(projectId);
+//     const button = document.createElement("button");
+//     button.textContent = loadProjectText + ` (${projectId})`;
+//     button.className = "bg-slate-700 px-2 py-1 rounded-xl";
+//     const iframe = document.createElement("iframe");
+//     iframe.src = `https://${url}/${projectId}/embed`;
+//     iframe.width = "485";
+//     iframe.height = "402";
+//     button.addEventListener("click", () => {
+//       button.replaceWith(iframe);
+//     });
+//     buttons.append(button);
+//   });
+  if (buttons.childElementCount) {
+    linkifiedDocument.body.append(buttons);
+  }
+  linkifiedDocument.querySelectorAll("img").forEach(async (element) => {
+    let request;
+    try {
+      request = await fetch(element.src);
+    } catch {
+      return;
+    }
+    if (request.status !== 200) {
+      return;
+    }
+    const contentType = request.headers.get("content-type");
+    const isAudio = contentType?.startsWith("audio/");
+    const isVideo = contentType?.startsWith("video/");
+    if (!isAudio && !isVideo) {
+      return;
+    }
+    const newElement = document.createElement(isAudio ? "audio" : "video");
+    newElement.src = element.src;
+    newElement.controls = true;
+    element.replaceWith(newElement);
+  });
+
+  return linkifiedDocument.body;
+};

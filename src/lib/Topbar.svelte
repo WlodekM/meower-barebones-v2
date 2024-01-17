@@ -1,10 +1,14 @@
 <script>
 	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
-    import { goto } from "@roxi/routify";
+    import { goto, isActive } from "@roxi/routify";
 </script>
 <div class="top">
     <h1 id="logo">Meower Barebones</h1>
-    <div id="controls">
+    <div class="links">
+        <a class:bold={$isActive("/home") ? "bold" : "normal"}    href="/home">Home</a>
+        <a class:bold={$isActive("/credits") ? "bold" : "normal"} href="/credits">Credits</a>
+        <!-- divider -->
+        <span> | </span>
         {#if $isLoggedIn}
             Logged in as {$user.username}
             {#if $isGuest}
@@ -15,7 +19,6 @@
         {/if}
         <!-- <div id=spacer style="width:25px;"></div> -->
         <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
-        <div id="spacer" style="width:50px;"></div>
         <button on:click={()=>{
             $isLoggedIn = false;
             $isGuest = false;
@@ -25,6 +28,11 @@
 </div>
 
 <style>
+    .bold {
+        font-weight: bold;
+        /* 👍 */
+    }
+
     .top {
         display: flex;
         align-items: center;

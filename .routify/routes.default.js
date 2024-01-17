@@ -17,6 +17,20 @@ export default {
   "children": [
     {
       "meta": {},
+      "id": "_default_credits_svelte",
+      "name": "credits",
+      "file": {
+        "path": "src/routes/credits.svelte",
+        "dir": "src/routes",
+        "base": "credits.svelte",
+        "ext": ".svelte",
+        "name": "credits"
+      },
+      "asyncModule": () => import('../src/routes/credits.svelte'),
+      "children": []
+    },
+    {
+      "meta": {},
       "id": "_default_home_svelte",
       "name": "home",
       "file": {

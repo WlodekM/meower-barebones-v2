@@ -8,6 +8,7 @@
     import { goto } from "@roxi/routify"
 	import Container from "@/lib/Container.svelte";
     import Post from "@/lib/Post.svelte";
+	import { emojify } from "@/lib/emojis.js";
     if(!$isLoggedIn) {$goto("/login")}
     const path = '/home?autoget'
 	function deleteFromArray(array, index) {
@@ -99,6 +100,8 @@
     <textarea rows="2" class="type-message" bind:this={postContent}></textarea>
     <button id="postbutton" on:click={()=>{
 		console.log("hi mom")
+		let post = postContent.value + " "
+		post = emojify(post)
 		if ($isGuest) {
 			fetch('https://webhooks.meower.org/post/home', {
 				method: 'POST',
@@ -106,12 +109,12 @@
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ "post": postContent.value + " ", "username": $user.username })
+				body: JSON.stringify({ "post": post, "username": $user.username })
 			})
 				.then(response => response.text())
 			postContent.value = ""
 		} else {
-			sendCmd("post_home", postContent.value + " ").catch((err) => {
+			sendCmd("post_home", post).catch((err) => {
 				postError = `Error when posting: "${err}"`
 			})
 			postContent.value = ""

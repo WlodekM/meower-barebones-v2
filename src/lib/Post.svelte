@@ -1,6 +1,7 @@
 <script>
     // import marked from "marked";
 	import MarkdownIt from "markdown-it";
+    import hljs from "highlight.js";
     import Container from "@/lib/Container.svelte";
     export let post;
 
@@ -15,6 +16,12 @@
 				breaks: true,
 				linkify: true,
 				typographer: true,
+                highlight(str, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(str, { language: lang }).value;
+                    }
+                    return "";
+                },
 			});
             //TODO - add user page
 			// md.linkify.add("@", {
@@ -43,11 +50,7 @@
 								attr => attr[0] === "src"
 							);
 							if (
-								!IMAGE_HOST_WHITELIST.some(o =>
-									childToken.attrs[srcPos][1]
-										.toLowerCase()
-										.startsWith(o.toLowerCase())
-								)
+								true
 							) {
 								childToken.attrs[srcPos][1] = "about:blank";
 								console.log(childToken);
