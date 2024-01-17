@@ -11,7 +11,7 @@
         <!-- divider -->
         <span> | </span>
         {#if $isLoggedIn}
-            Logged in as {$user.username}
+            Logged in as {$user.name}
             {#if $isGuest}
                 (Guest)
             {/if}
