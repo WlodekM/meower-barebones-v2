@@ -12,10 +12,12 @@
         <div class="title">
             Login
         </div>
-        <form class="form left" style="width: 100%;" id="loginForm" on:submit={(e)=>{
+        <form class="form left" style="width: 100%;" id="loginForm" on:submit={async (e)=>{
             e.preventDefault();
             if (!username) return
-            $user.username = username
+            // let res = await fetch("https://api.meower.org/users/${username}")
+            // const json = res.json() ?? {}
+            // $user = json
             $isGuest = !password
             $isLoggedIn = true
             if (!$isGuest) {
@@ -39,7 +41,10 @@
                 <span>
                     Password <i>(optional)</i>:
                 </span>
-                <input { type } name="password" id="password" on:input={(event)=>{password = event.target.value}}>
+                <input { type } name="password" id="password" on:input={(event)=>{
+                    //@ts-ignore
+                    password = event.target.value
+                    }}>
             </div>
             <div class="form-section">
                 <span style="text-align: left!important;">

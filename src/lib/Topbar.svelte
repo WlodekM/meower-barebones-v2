@@ -6,6 +6,7 @@
     <h1 id="logo">Meower Barebones</h1>
     <div class="links">
         <a class:bold={$isActive("/home") ? "bold" : "normal"}    href="/home">Home</a>
+        <a class:bold={$isActive("/chats") ? "bold" : "normal"} href="/chats">Chats</a>
         <a class:bold={$isActive("/credits") ? "bold" : "normal"} href="/credits">Credits</a>
         <!-- divider -->
         <span> | </span>

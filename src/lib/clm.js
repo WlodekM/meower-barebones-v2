@@ -1,6 +1,7 @@
-import { isGuest, ulist, isLoggedIn } from './stores.js'
+import { chats, ulist, isLoggedIn, user, authHeader } from './stores.js'
 import { linkUrl } from "./urls.js";
 import { writable } from "svelte/store";
+import { tick } from "svelte"
 import Cloudlink from "./cloudlink.js";
 export let isWaitingForStatus = writable(false);
 export let status = null;
@@ -79,6 +80,81 @@ function connect() {
     link.connect(linkUrl)
 }
 
+let _chats, _authHeader = null
+chats.subscribe(v => {
+	_chats = v;
+	// if (_authHeader.username && _authHeader.token) {
+	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
+	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
+	// }
+});
+
+authHeader.subscribe(v => {
+	_authHeader = v;
+	// if (_authHeader.username && _authHeader.token) {
+	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
+	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
+	// }
+});
+
+
+link.on("direct", cmd => {
+    if (cmd.val.mode === "update_chat") {
+        let itemIndex = _chats.findIndex(
+            chat => chat._id === cmd.val.payload._id
+        );
+        if (itemIndex === -1) return;
+        _chats[itemIndex] = Object.assign(
+            _chats[itemIndex],
+            cmd.val.payload
+        );
+        chats.set(_chats);
+    }
+});
+link.on("direct", cmd => {
+    if (cmd.val.mode === "create_chat") {
+        let itemIndex = _chats.findIndex(
+            chat => chat._id === cmd.val.payload._id
+        );
+        if (itemIndex !== -1) return;
+        _chats.push(cmd.val.payload);
+        chats.set(_chats);
+    }
+});
+link.on("direct", async cmd => {
+    if (cmd.val.mode === "auth") {
+        // set user, auth header, and relationships
+        user.update(v =>
+            Object.assign(v, {
+                ...cmd.val.payload.account,
+                name: cmd.val.payload.username,
+            })
+        );
+        authHeader.set({
+            username: cmd.val.payload.username,
+            token: cmd.val.payload.token,
+        });
+        // _relationships = {};
+        // for (let relationship of cmd.val.payload.relationships) {
+        //     _relationships[relationship.username] = relationship.state;
+        // }
+        // relationships.set(_relationships);
+
+        // get and set chats
+        await tick();
+        const resp = await fetch(`https://api.meower.org/chats?autoget=1`, {
+            headers: _authHeader,
+        });
+        const json = await resp.json();
+        chats.set(json.autoget);
+    }
+});
+link.on("direct", cmd => {
+    if (cmd.val.mode === "delete") {
+        _chats = _chats.filter(chat => chat._id !== cmd.val.id);
+        chats.set(_chats);
+    }
+});
 // cl.onmessage = (event) => {
 // 	console.log(event.data);
 //     if(JSON.parse(event.data).val == "I:112 | Trusted Access enabled") {

@@ -17,6 +17,37 @@ export default {
   "children": [
     {
       "meta": {},
+      "id": "_default_chats",
+      "name": "chats",
+      "module": false,
+      "file": {
+        "path": "src/routes/chats",
+        "dir": "src/routes",
+        "base": "chats",
+        "ext": "",
+        "name": "chats"
+      },
+      "children": [
+        {
+          "meta": {
+            "isDefault": true
+          },
+          "id": "_default_chats_index_svelte",
+          "name": "index",
+          "file": {
+            "path": "src/routes/chats/index.svelte",
+            "dir": "src/routes/chats",
+            "base": "index.svelte",
+            "ext": ".svelte",
+            "name": "index"
+          },
+          "asyncModule": () => import('../src/routes/chats/index.svelte'),
+          "children": []
+        }
+      ]
+    },
+    {
+      "meta": {},
       "id": "_default_credits_svelte",
       "name": "credits",
       "file": {
