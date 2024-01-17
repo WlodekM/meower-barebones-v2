@@ -11,8 +11,8 @@
             "@": ["./src"],
             "@/*": ["./src/*"]
         },
-        "lib": ["es2017"],
-        "target": "ES2017"
+        "lib": ["es2021"],
+        "target": "ES2021"
     },
     "include": [
         "src/**/*.d.ts",
