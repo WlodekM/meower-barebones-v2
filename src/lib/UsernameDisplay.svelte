@@ -1,5 +1,8 @@
 <script>
     import { ulist } from "@/lib/stores.js";
     export let member;
+    export let showOnline = true
 </script>
-<span style="color: {$ulist?.includes(member) ? "limegreen" : "gray"};">{member}</span>
+<a href="/users/{member}">
+    <span style="color: {showOnline ? $ulist?.includes(member) ? "limegreen" : "gray" : "inherit"};">{member}</span>
+</a>

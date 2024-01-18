@@ -173,7 +173,13 @@
             ? $chat.members.slice(0, 49)
             : $chat.members}
         <h1 style="margin: 0;margin-bottom: 8px;">
-            {$chat.nickname}
+            {#if $chat.type == 0}
+                {$chat.nickname}
+            {:else}
+                <UsernameDisplay member={$chat.members.filter(
+                    username => username !== $user.name
+                )[0]} showOnline={false} />
+            {/if}
         </h1>
         <details>
             <summary style="cursor: pointer;">Members</summary>

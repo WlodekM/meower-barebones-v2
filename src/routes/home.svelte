@@ -71,12 +71,14 @@
 			"RevowerJS": "Bridged",
 			"Webhooks": "Webhook",
 		}
-        if (badges[post.u]) {
-            post.u = `${post.p.split(":")[0]} <badge>${String(badges[post.u]).toUpperCase()}</badge>`
-            post.p = post.p.split(":").slice(1).join(":")
+		let thePost = post
+        if (badges[thePost.u]) {
+            thePost.u = `${thePost.p.split(":")[0]}`
+			thePost.bridged = true
+            thePost.p = thePost.p.split(":").slice(1).join(":")
         }
-		post.p.replaceAll("\n", "<br>")
-		return post
+		thePost.p.replaceAll("\n", "<br>")
+		return thePost
 	}
 	let postContent
 	console.log(posts)

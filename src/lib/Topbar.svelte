@@ -5,11 +5,14 @@
     import { tick } from "svelte"
 </script>
 <div class="top">
-    <h1 id="logo">Meower Barebones</h1>
+    <h1 id="logo" on:click={()=>{$goto("/home")}}>Meower Barebones</h1>
     <div class="links">
         <button class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}>Home</button>
         <button class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}>Chats</button>
         <button class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}}>Credits</button>
+        <a href="{`/users/${$user.name}`}">
+            <button class:bold={$isActive("/credits") ? "bold" : "normal"}>Settings</button>
+        </a>
         <!-- divider -->
         <span> | </span>
         {#if $isLoggedIn}
@@ -23,9 +26,7 @@
         <!-- <div id=spacer style="width:25px;"></div> -->
         <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
         <button on:click={()=>{
-            $isLoggedIn = false;
-            $isGuest = false;
-            $goto("/login")
+            $goto("/logout")
         }}>Log out</button>
     </div>
 </div>

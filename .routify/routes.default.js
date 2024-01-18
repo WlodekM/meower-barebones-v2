@@ -122,6 +122,52 @@ export default {
       "children": []
     },
     {
+      "meta": {},
+      "id": "_default_logout_svelte",
+      "name": "logout",
+      "file": {
+        "path": "src/routes/logout.svelte",
+        "dir": "src/routes",
+        "base": "logout.svelte",
+        "ext": ".svelte",
+        "name": "logout"
+      },
+      "asyncModule": () => import('../src/routes/logout.svelte'),
+      "children": []
+    },
+    {
+      "meta": {},
+      "id": "_default_users",
+      "name": "users",
+      "module": false,
+      "file": {
+        "path": "src/routes/users",
+        "dir": "src/routes",
+        "base": "users",
+        "ext": "",
+        "name": "users"
+      },
+      "children": [
+        {
+          "meta": {
+            "dynamic": true,
+            "order": false
+          },
+          "id": "_default_users__username__svelte",
+          "name": "[username]",
+          "file": {
+            "path": "src/routes/users/[username].svelte",
+            "dir": "src/routes/users",
+            "base": "[username].svelte",
+            "ext": ".svelte",
+            "name": "[username]"
+          },
+          "asyncModule": () => import('../src/routes/users/[username].svelte'),
+          "children": []
+        }
+      ]
+    },
+    {
       "meta": {
         "dynamic": true,
         "dynamicSpread": true,

@@ -3,10 +3,64 @@
 	import MarkdownIt from "markdown-it";
     import hljs from "highlight.js";
     import Container from "@/lib/Container.svelte";
-    import { ulist } from "./stores"
+    import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
+    import { ulist, user } from "./stores"
     export let post;
 
     // yoink
+	function markdown(input) {
+		try {
+			const md = new MarkdownIt("default", {
+				breaks: true,
+				linkify: true,
+				typographer:  true,
+			});
+			md.linkify.add("@", {
+				validate: function (text, pos) {
+					var tail = text.slice(pos);
+					return tail.match(/[a-zA-Z0-9-_]{1,20}/gs)[0].length;
+				},
+				normalize: function (match) {
+					match.url = window.location.host + "/users/" + match.url.replace(/^@/, '');
+				}
+			});
+			const tokens = md.parse(input.replaceAll(/\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs, "").replaceAll(/\*\*\*\*/gs, "\\*\\*\\*\\*"));
+			for (const token of tokens) {
+				if (token.children) {
+					for (const childToken of token.children) {
+						if (childToken.type === "image") {
+							const srcPos = childToken.attrs.findIndex(attr => attr[0] === "src");
+							if (true) {
+								childToken.attrs[srcPos][1] = "about:blank";
+								console.log(childToken);
+							}
+						}
+						if (childToken.type === "link_open") {
+							const href = childToken.attrs.find(attr => attr[0] === "href")[1];
+							childToken.attrs.push(["onclick", `return confirmLink('${href}')`]);
+						}
+					}
+				}
+			}
+			input = md.renderer.render(tokens, md.options);
+
+			// add quote containers to blockquotes (although, quotes are currently broken)
+			input = input.replaceAll(
+				/<blockquote>(.+?)<\/blockquote>/gms,
+				'<div class="quote-container"><blockquote>$1</blockquote></div>'
+			);
+		} catch (e) {
+			console.error(`Failed to load markdown on ${post.post_id}: ${e}`);
+		}
+
+		// twemoji
+		// input = twemoji.parse(input, {
+		// 	folder: "svg",
+		// 	ext: ".svg",
+		// 	size: 20,
+		// });
+		return input
+	}
 	/** @param {string} content */
 	async function addFancyElements(content) {
 		// markdown (which has HTML escaping built-in)
@@ -25,18 +79,18 @@
                 },
 			});
             //TODO - add user page
-			// md.linkify.add("@", {
-			// 	validate: function (text, pos) {
-			// 		var tail = text.slice(pos);
-			// 		return tail.match(/[a-zA-Z0-9-_]{1,20}/gs)[0].length;
-			// 	},
-			// 	normalize: function (match) {
-			// 		match.url =
-			// 			window.location.host +
-			// 			"/users/" +
-			// 			match.url.replace(/^@/, "");
-			// 	},
-			// });
+			md.linkify.add("@", {
+				validate: function (text, pos) {
+					var tail = text.slice(pos);
+					return tail.match(/[a-zA-Z0-9-_]{1,20}/gs)[0].length;
+				},
+				normalize: function (match) {
+					match.url =
+						window.location.host +
+						"/users/" +
+						match.url.replace(/^@/, "");
+				},
+			});
 			const tokens = md.parse(
 				content
 					.replaceAll(/\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs, "")
@@ -104,7 +158,7 @@
 		} catch (e) {
 			// this is to stop any possible XSS attacks by bypassing the markdown lib
 			// which is responsible for escaping HTML
-			return `Failed rendering post: ${e}`;
+			console.error(`Failed rendering post: ${e}`);
 		}
 
 		// twemoji
@@ -116,10 +170,14 @@
 
 		return renderedContent;
 	}
+
 </script>
 <div class="post container">
     <div class="post-header">
-        {@html post.u}
+        <UsernameDisplay member={post.u} showOnline={false} />
+		{#if post.bridged}
+			<badge>BRIDGED</badge>
+		{/if}
         {#if post.p.endsWith(" ")}
             <span class="badge">
                 Barebones
@@ -131,7 +189,7 @@
     </div>
     <p>
         <!-- {@html marked(post.p)} -->
-        {#await addFancyElements(post.p) then content}
+        {#await ($user.xss ? markdown : addFancyElements)(post.p) then content}
             {@html content}
         {/await}
     </p>

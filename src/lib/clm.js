@@ -16,6 +16,55 @@ connect()
 // @ts-ignore
 window.cljs = link;
 
+let _chats, _authHeader = null
+let _user = {
+    name: null,
+    flags: 0,
+    permissions: 0,
+    unread_inbox: false,
+    theme: "orange",
+    mode: true,
+    sfx: true,
+    bgm: false,
+    bgm_song: 2,
+    layout: "new",
+    debug: false,
+    hide_blocked_users: false,
+    favorited_chats: [],
+    embeds_enabled: true,
+    pfp_data: 1,
+    quote: "",
+    ban: {
+        state: "None",
+        expires: 0,
+        reason: "",
+    },
+    xss: false
+};
+chats.subscribe(v => {
+	_chats = v;
+	// if (_authHeader.username && _authHeader.token) {
+	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
+	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
+	// }
+});
+
+authHeader.subscribe(v => {
+	_authHeader = v;
+	// if (_authHeader.username && _authHeader.token) {
+	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
+	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
+	// }
+});
+
+user.subscribe(v => {
+	_user = v;
+	// if (_authHeader.username && _authHeader.token) {
+	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
+	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
+	// }
+});
+
 //NOTE - No, I didn't steal this from Meower Svelte, what are you talking about? (4)
 /**
  * Send a "Meower request" - a packet that makes the server respond with a direct and a statuscode packet.
@@ -80,23 +129,36 @@ function connect() {
     link.connect(linkUrl)
 }
 
-let _chats, _authHeader = null
-chats.subscribe(v => {
-	_chats = v;
-	// if (_authHeader.username && _authHeader.token) {
-	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
-	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
-	// }
-});
-
-authHeader.subscribe(v => {
-	_authHeader = v;
-	// if (_authHeader.username && _authHeader.token) {
-	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
-	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
-	// }
-});
-
+/**
+ * Sends a request to update the user's settings.
+ *
+ * @returns {Promise<object | string>} Either an object or an error code; see meowerRequest.
+ */
+export async function updateProfile(updatedValues) {
+	if (!_user.name) return;
+	Object.assign(_user, updatedValues);
+	user.set(_user);
+	return meowerRequest({
+		cmd: "direct",
+		val: {
+			cmd: "update_config",
+			val: updatedValues,
+			/*{
+				unread_inbox: profile.unread_inbox,
+				theme: profile.theme,
+				mode: profile.mode,
+				sfx: profile.sfx,
+				bgm: profile.bgm,
+				bgm_song: profile.bgm_song,
+				layout: profile.layout,
+				hide_blocked_users: profile.hide_blocked_users,
+				favorited_chats: profile.favorited_chats,
+				pfp_data: profile.pfp_data,
+				quote: profile.quote,
+			},*/
+		},
+	});
+}
 
 link.on("direct", cmd => {
     if (cmd.val.mode === "update_chat") {
