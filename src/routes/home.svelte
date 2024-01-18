@@ -46,7 +46,7 @@
     link.on("direct", (cmd) => {
 		if (!cmd.val) return;
         // console.log(`h`, cmd.val);
-        if (cmd.val["post_origin"] == "") {
+        if (cmd.val["post_origin"] == "home") {
 			// svelte moment
 			console.log("its a post!!!111", cmd.val)
 			//TODO - Rename this var

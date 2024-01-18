@@ -119,11 +119,13 @@
 	 * @type {Array}
 	 */
     let posts = []
-	loadPosts(1).then((aa)=>{
-        console.log("u", aa)
-		//@ts-ignore
-		posts = aa
-	})
+    if($params.chatid != "livechat") {
+        loadPosts(1).then((aa)=>{
+            console.log("u", aa)
+            //@ts-ignore
+            posts = aa
+        })
+    }
     clm.link.on("direct", (cmd) => {
 		if (!cmd.val) return;
         // console.log(`h`, cmd.val);
@@ -189,15 +191,15 @@
             let post = postContent.value + " "
             // post = emojify(post)
             if ($isGuest) {
-                fetch('https://webhooks.meower.org/post/home', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ "post": post, "username": $user.name })
-                })
-                    .then(response => response.text())
+                // fetch('https://webhooks.meower.org/post/home', {
+                //     method: 'POST',
+                //     headers: {
+                //         'Accept': 'application/json',
+                //         'Content-Type': 'application/json'
+                //     },
+                //     body: JSON.stringify({ "post": post, "username": $user.name })
+                // })
+                //     .then(response => response.text())
                 postContent.value = ""
             } else {
                 clm.sendCmd("post_chat", {chatid: $params.chatid, p: post}).catch((err) => {
