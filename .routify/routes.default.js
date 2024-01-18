@@ -30,6 +30,23 @@ export default {
       "children": [
         {
           "meta": {
+            "dynamic": true,
+            "order": false
+          },
+          "id": "_default_chats__chatid__svelte",
+          "name": "[chatid]",
+          "file": {
+            "path": "src/routes/chats/[chatid].svelte",
+            "dir": "src/routes/chats",
+            "base": "[chatid].svelte",
+            "ext": ".svelte",
+            "name": "[chatid]"
+          },
+          "asyncModule": () => import('../src/routes/chats/[chatid].svelte'),
+          "children": []
+        },
+        {
+          "meta": {
             "isDefault": true
           },
           "id": "_default_chats_index_svelte",

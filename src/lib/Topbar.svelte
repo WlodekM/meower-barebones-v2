@@ -1,13 +1,15 @@
 <script>
-	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
+	import { isGuest, user, isLoggedIn, page } from '@/lib/stores.js'
+    import * as clm from "./clm.js";
     import { goto, isActive } from "@roxi/routify";
+    import { tick } from "svelte"
 </script>
 <div class="top">
     <h1 id="logo">Meower Barebones</h1>
     <div class="links">
-        <a class:bold={$isActive("/home") ? "bold" : "normal"}    href="/home">Home</a>
-        <a class:bold={$isActive("/chats") ? "bold" : "normal"} href="/chats">Chats</a>
-        <a class:bold={$isActive("/credits") ? "bold" : "normal"} href="/credits">Credits</a>
+        <span class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}>Home</span>
+        <span class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}>Chats</span>
+        <span class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}}>Credits</span>
         <!-- divider -->
         <span> | </span>
         {#if $isLoggedIn}

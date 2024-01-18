@@ -35,6 +35,17 @@ export let user = writable({
 });
 export let chats = writable([])
 export let ulist = writable([])
+export let page  = writable("")
+export const chat = writable({
+	_id: "",
+	type: 0,
+	nickname: "",
+	owner: "",
+	members: [],
+	created: 0,
+	last_active: 0,
+	deleted: false,
+});
 export let authHeader = writable({
     username: null,
     token: null,

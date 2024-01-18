@@ -46,7 +46,7 @@
     link.on("direct", (cmd) => {
 		if (!cmd.val) return;
         // console.log(`h`, cmd.val);
-        if (cmd.val["post_origin"]) {
+        if (cmd.val["post_origin"] == "") {
 			// svelte moment
 			console.log("its a post!!!111", cmd.val)
 			//TODO - Rename this var
@@ -109,7 +109,7 @@
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ "post": post, "username": $user.username })
+				body: JSON.stringify({ "post": post, "username": $user.name })
 			})
 				.then(response => response.text())
 			postContent.value = ""
