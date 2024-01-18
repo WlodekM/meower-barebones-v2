@@ -7,9 +7,9 @@
 <div class="top">
     <h1 id="logo">Meower Barebones</h1>
     <div class="links">
-        <span class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}>Home</span>
-        <span class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}>Chats</span>
-        <span class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}}>Credits</span>
+        <button class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}>Home</button>
+        <button class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}>Chats</button>
+        <button class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}}>Credits</button>
         <!-- divider -->
         <span> | </span>
         {#if $isLoggedIn}
