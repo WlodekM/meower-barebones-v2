@@ -1,6 +1,7 @@
 <script>
     import { user, chats, isLoggedIn, ulist } from "@/lib/stores.js";
     import { goto, url } from "@roxi/routify";
+    import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
     import Topbar from "@/lib/Topbar.svelte"
     import Container from "@/lib/Container.svelte"
 	let sortedChats;
@@ -25,7 +26,7 @@
                     ? chat.members.slice(0, 9)
                     : chat.members}
                 Members: {#each members as member}
-                    <span style="color: {$ulist?.includes(member) ? "lime" : "gray"};">{member}</span>
+                    <UsernameDisplay member={member} />
                     {#if members.indexOf(member) != members.length -1},&nbsp;{/if}
                 {/each}
                 {#if chat.members.length > 10}

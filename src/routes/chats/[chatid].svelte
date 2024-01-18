@@ -3,6 +3,7 @@
     import { apiUrl } from "@/lib/urls.js";
     import { goto, params } from "@roxi/routify";
 	import {onMount, onDestroy} from "svelte";
+    import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
     import Topbar from "@/lib/Topbar.svelte"
     import Container from "@/lib/Container.svelte"
     import Post from "@/lib/Post.svelte";
@@ -177,7 +178,7 @@
         <details>
             <summary style="cursor: pointer;">Members</summary>
             {#each members as member}
-                <span style="color: {$ulist?.includes(member) ? "lime" : "gray"};">{member}</span>
+                <UsernameDisplay member={member} />
                 {#if members.indexOf(member) != members.length -1},&nbsp;{/if}
             {/each}
         </details>

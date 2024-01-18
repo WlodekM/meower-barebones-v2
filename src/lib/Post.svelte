@@ -3,6 +3,7 @@
 	import MarkdownIt from "markdown-it";
     import hljs from "highlight.js";
     import Container from "@/lib/Container.svelte";
+    import { ulist } from "./stores"
     export let post;
 
     // yoink
@@ -124,6 +125,9 @@
                 Barebones
             </span>
         {/if}
+		{#if $ulist.includes(post.u)}
+			<div class="online"></div>
+		{/if}
     </div>
     <p>
         <!-- {@html marked(post.p)} -->
@@ -138,6 +142,19 @@
     .post {
         margin-top: 10px;
     }
+
+	.online {
+		width: 10px;
+		height: 10px;
+		margin-block: auto;
+		background: limegreen;
+		border-radius: 100%;
+	}
+
+	.post-header {
+		display: inline-flex;
+		gap: 10px;
+	}
 
     /* .post div img {
         width: 150px;
