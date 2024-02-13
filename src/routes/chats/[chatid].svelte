@@ -8,6 +8,7 @@
     import Container from "@/lib/Container.svelte"
     import Post from "@/lib/Post.svelte";
     import * as clm from "@/lib/clm.js";
+    import PostList from "@/lib/postList.svelte";
     onMount(async () => {
 		if ($params.chatid === "livechat") {
 			chat.set({
@@ -89,79 +90,6 @@
 			});
 		}
 	});
-	let queryParams = {};
-    const path = `posts/${$params.chatid}`
-	/**
-	 * Loads posts
-	 * @returns {Promise<{Array}>}
-	 */
-    async function loadPosts(page) {
-        const params = new URLSearchParams({
-            autoget: "1",
-            page: page.toString(),
-            ...queryParams,
-        }).toString();
-        const resp = await fetch(`${apiUrl}${path}?${params}`, {headers: $authHeader})
-        if (!resp.ok) {
-            throw new Error('Response code is not OK; code is ' + resp.status)
-        }
-        const json = await resp.json()
-        console.log(`!!`, json)
-
-
-        const result = json.autoget
-        return result
-    }
-	function deleteFromArray(array, index) {
-		array.splice(index, 1)
-	}
-	/**
-     * Posts
-	 * @type {Array}
-	 */
-    let posts = []
-    if($params.chatid != "livechat") {
-        loadPosts(1).then((aa)=>{
-            console.log("u", aa)
-            //@ts-ignore
-            posts = aa
-        })
-    }
-    clm.link.on("direct", (cmd) => {
-		if (!cmd.val) return;
-        // console.log(`h`, cmd.val);
-        if (cmd.val["post_origin"] == $chat._id) {
-			// svelte moment
-			console.log("its a post!!!111", cmd.val)
-			//TODO - Rename this var
-			let temp = posts
-            temp.unshift(cmd.val)
-			posts = temp
-			console.log(posts)
-        }
-    });
-    clm.link.on("direct", (cmd) => {
-        console.log("direct", cmd)
-		if (cmd.val.mode != "delete") return;
-        // console.log(`h`, cmd.val);
-        let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
-		console.log(`delete post #${postID} (${cmd.val.id})\n`, "object:", posts[postID])
-		deleteFromArray(posts, postID)
-    });
-    function postsMapThing(post) {
-        const badges = {
-            "Discord": "Bridged",
-            "Revower": "Bridged",
-            "RevowerJS": "Bridged",
-            "Webhooks": "Webhook",
-        }
-        if (badges[post.u]) {
-            post.u = `${post.p.split(":")[0]} <badge>${String(badges[post.u]).toUpperCase()}</badge>`
-            post.p = post.p.split(":").slice(1).join(":")
-        }
-        post.p.replaceAll("\n", "<br>")
-        return post
-    }
     let postContent, postError;
 </script>
 
@@ -216,7 +144,5 @@
             }
         }}>Post!</button>
     </div>
-    {#each posts?.map(postsMapThing) as post}
-        <Post post={post} />
-    {/each}
+    <PostList path={`posts/${$params.chatid}`} origin={$chat._id} />
 </div>
