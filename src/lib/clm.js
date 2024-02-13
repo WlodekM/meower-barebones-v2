@@ -11,6 +11,7 @@ export let status = null;
  * The single CloudLink instance used by the manager.
  */
 export const link = new Cloudlink();
+let events = {}
 export let connected = false
 connect()
 // @ts-ignore
@@ -106,8 +107,22 @@ export async function meowerRequest(data) {
 	});
 }
 
-function connect() {
-    link.on("connected", () => {
+export function connect() {
+    console.log(events)
+    if(events) {
+        for (const ev in events) {
+            if (Object.hasOwnProperty.call(events, ev)) {
+                const evID = events[ev];
+                if(evID) {
+                    delete events[ev]
+                    console.log(`link.off("${evID}") // ${ev}`)
+                    link.off(evID)
+                }
+            }
+        }
+    }
+    link.connect(linkUrl)
+    events.connected = link.on("connected", () => {
         // disconnected.set(false);
         // attemptedAutoReconnect.set(false);
         connected = true
@@ -115,10 +130,10 @@ function connect() {
             link.send({cmd: "ping", val: ""});
         }, 10000);
     });
-	link.once("connectionstart", () => {
-        //...
-    });
-    link.on("ulist", cmd => {
+	// events.connectionstart = link.once("connectionstart", () => {
+    //     //...
+    // });
+    events.ulist = link.on("ulist", cmd => {
         console.log("ulist", cmd.val)
         const _ulist = cmd.val.split(";");
         if (_ulist[_ulist.length - 1] === "") {
@@ -126,7 +141,69 @@ function connect() {
         }
         ulist.set(_ulist);
     });
-    link.connect(linkUrl)
+    events.update_chat = link.on("direct", cmd => {
+        if (cmd.val.mode === "update_chat") {
+            let itemIndex = _chats.findIndex(
+                chat => chat._id === cmd.val.payload._id
+            );
+            if (itemIndex === -1) return;
+            _chats[itemIndex] = Object.assign(
+                _chats[itemIndex],
+                cmd.val.payload
+            );
+            chats.set(_chats);
+        }
+    });
+    events.create_chat = link.on("direct", cmd => {
+        if (cmd.val.mode === "create_chat") {
+            let itemIndex = _chats.findIndex(
+                chat => chat._id === cmd.val.payload._id
+            );
+            if (itemIndex !== -1) return;
+            _chats.push(cmd.val.payload);
+            chats.set(_chats);
+        }
+    });
+    events.auth = link.on("direct", async cmd => {
+        if (cmd.val.mode === "auth") {
+            // set user, auth header, and relationships
+            user.update(v =>
+                Object.assign(v, {
+                    ...cmd.val.payload.account,
+                    name: cmd.val.payload.username,
+                })
+            );
+            authHeader.set({
+                username: cmd.val.payload.username,
+                token: cmd.val.payload.token,
+            });
+            // _relationships = {};
+            // for (let relationship of cmd.val.payload.relationships) {
+            //     _relationships[relationship.username] = relationship.state;
+            // }
+            // relationships.set(_relationships);
+    
+            // get and set chats
+            await tick();
+            const resp = await fetch(`https://api.meower.org/chats?autoget=1`, {
+                headers: _authHeader,
+            });
+            const json = await resp.json();
+            chats.set(json.autoget);
+        }
+    });
+    events.delete = link.on("direct", cmd => {
+        if (cmd.val.mode === "delete") {
+            _chats = _chats.filter(chat => chat._id !== cmd.val.id);
+            chats.set(_chats);
+        }
+    });
+    events.disconnect = link.on("disconnected", (e) => {
+        console.log("DISCONNECTED")
+        isLoggedIn.set(false)
+        connected = false
+        connect()
+    })
 }
 
 /**
@@ -160,63 +237,6 @@ export async function updateProfile(updatedValues) {
 	});
 }
 
-link.on("direct", cmd => {
-    if (cmd.val.mode === "update_chat") {
-        let itemIndex = _chats.findIndex(
-            chat => chat._id === cmd.val.payload._id
-        );
-        if (itemIndex === -1) return;
-        _chats[itemIndex] = Object.assign(
-            _chats[itemIndex],
-            cmd.val.payload
-        );
-        chats.set(_chats);
-    }
-});
-link.on("direct", cmd => {
-    if (cmd.val.mode === "create_chat") {
-        let itemIndex = _chats.findIndex(
-            chat => chat._id === cmd.val.payload._id
-        );
-        if (itemIndex !== -1) return;
-        _chats.push(cmd.val.payload);
-        chats.set(_chats);
-    }
-});
-link.on("direct", async cmd => {
-    if (cmd.val.mode === "auth") {
-        // set user, auth header, and relationships
-        user.update(v =>
-            Object.assign(v, {
-                ...cmd.val.payload.account,
-                name: cmd.val.payload.username,
-            })
-        );
-        authHeader.set({
-            username: cmd.val.payload.username,
-            token: cmd.val.payload.token,
-        });
-        // _relationships = {};
-        // for (let relationship of cmd.val.payload.relationships) {
-        //     _relationships[relationship.username] = relationship.state;
-        // }
-        // relationships.set(_relationships);
-
-        // get and set chats
-        await tick();
-        const resp = await fetch(`https://api.meower.org/chats?autoget=1`, {
-            headers: _authHeader,
-        });
-        const json = await resp.json();
-        chats.set(json.autoget);
-    }
-});
-link.on("direct", cmd => {
-    if (cmd.val.mode === "delete") {
-        _chats = _chats.filter(chat => chat._id !== cmd.val.id);
-        chats.set(_chats);
-    }
-});
 // cl.onmessage = (event) => {
 // 	console.log(event.data);
 //     if(JSON.parse(event.data).val == "I:112 | Trusted Access enabled") {
@@ -227,11 +247,6 @@ link.on("direct", cmd => {
 //         status = JSON.parse(event.data).val
 //     }
 // };
-
-link.on("disconnect", (e) => {
-    isLoggedIn.set(false)
-    connected = false
-})
 
 export function sendCmd(cmd, val) {
     if(!connected) connect()

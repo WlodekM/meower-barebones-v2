@@ -3,6 +3,7 @@
 
 	import {goto} from "@roxi/routify";
 	import {onMount, tick} from "svelte";
+    import { link } from "@/lib/clm.js";
 
 	onMount(async () => {
 		localStorage.removeItem("meower_savedusername");
@@ -38,6 +39,7 @@
         $isLoggedIn = false;
         $isGuest = false;
 		// screen.set("setup");
+        link.disconnect()
 		await tick();
         $goto("/login")
 	});

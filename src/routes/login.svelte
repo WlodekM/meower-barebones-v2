@@ -1,5 +1,6 @@
 <script>
-    import { sendCmd } from "@/lib/clm"
+    import { sendCmd, link, connected, connect } from "@/lib/clm"
+    import { linkUrl } from "@/lib/urls.js";
     import { goto } from "@roxi/routify"
     import { isLoggedIn, isGuest, user } from "@/lib/stores.js"
     let username, password

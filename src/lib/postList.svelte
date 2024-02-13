@@ -4,7 +4,9 @@
     import { link } from "./clm";
     import { apiUrl } from '@/lib/urls.js'
     import { authHeader } from "./stores.js";
+
     export const path = '/home'
+    export const origin = "home"
 
     let queryParams = {}
     
@@ -34,8 +36,6 @@
 		array.splice(index, 1)
 	}
 
-    export const origin = "home"
-
     let posts = [];
 
     (async () => {
@@ -47,17 +47,21 @@
     let destroy = () => {}
 
     onMount(()=>{
+        console.log("mounted")
         const eventID = link.on("direct", (cmd) => {
+            console.log("cmd", cmd)
             if (!cmd.val) return;
             if (cmd.val["post_origin"] == origin) {
+                console.log("New post!!1!11111!1!!!1!1!!1!!!1!1!1")
                 posts.unshift(cmd.val)
-            }
+            } else if (cmd.val["post_origin"]) console.log(cmd.val["post_origin"])
             if (cmd.val.mode == "delete") {
                 let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
                 if (posts[postID]) deleteFromArray(posts, postID)
             }
         })
         destroy = ()=>{
+            console.log("destroyed")
             link.off(eventID)
         }
     })
