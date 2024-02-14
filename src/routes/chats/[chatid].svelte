@@ -159,7 +159,7 @@
 			if (typeof window.mixins != "array") window.mixins = []
 			//@ts-ignore
 			window.mixins.forEach(mixin => {
-				if(mixin.type == "onPost") {
+				if(mixin.type == "onPosted") {
 					mixin.function()
 				}
 			});
