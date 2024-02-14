@@ -20,14 +20,17 @@
             {#if $isGuest}
                 (Guest)
             {/if}
+            <button on:click={()=>{
+                $goto("/logout")
+            }}>Log out</button>
         {:else}
             <span color="red">Not logged in</span>
+            <button on:click={()=>{
+                $goto("/login")
+            }}>Log in</button>
         {/if}
         <!-- <div id=spacer style="width:25px;"></div> -->
         <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
-        <button on:click={()=>{
-            $goto("/logout")
-        }}>Log out</button>
     </div>
 </div>
 

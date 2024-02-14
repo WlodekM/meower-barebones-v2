@@ -7,6 +7,20 @@
     --accent: #00aaff;
 }
 
+/* button, input[type="text"], input[type="search"], input[type="password"], input[type="datetime-local"], textarea, select {
+	border: solid 2px var(--foreground-orange);
+	border-radius: 5px;
+	outline: none;
+	background-color: var(--orange);
+	color: var(--foreground-orange);
+	padding: .5em 1em;
+	box-sizing: border-box;
+	margin-bottom: -.15rem;
+	margin-top: 0;
+	font-family: inherit;
+	font-size: inherit;
+} */
+
 body {
     font-family: 'Comic Sans', 'Comic Sans MS';
     background: var(--background);
@@ -106,6 +120,7 @@ badge, .badge {
 button, textarea, input {
     background: var(--secondary-bg);
     border: var(--border) 2px solid;
+	box-sizing: border-box;
     border-radius: 5px;
 }
 

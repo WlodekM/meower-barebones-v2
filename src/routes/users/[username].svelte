@@ -115,9 +115,19 @@
     <div style="padding: 8px; padding-block: 0;">
         <Container>
             <h2 style="margin: 0;margin-bottom: 8px;">Quote</h2>
-            {#await addFancyElements(data.quote) then content}
-                <i>{@html content}</i>
-            {/await}
+			{#if $params.username == $user.name}
+				<textarea name="Quote" id="quote"
+					placeholder="Write something..."
+					maxlength="360"
+					style="width: 100%"
+					bind:value={$user.quote}
+					on:change={() => clm.updateProfile({quote: $user.quote})}
+				/>
+			{:else}
+				{#await addFancyElements(data.quote) then content}
+					<i>{@html content}</i>
+				{/await}
+			{/if}
         </Container>
     </div>
     {#if $params.username == $user.name}
