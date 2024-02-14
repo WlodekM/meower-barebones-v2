@@ -1,4 +1,8 @@
-<div class="container">
+<script>
+    export let style = "";
+</script>
+
+<div class="container" style={style ?? ""}>
     <slot />
 </div>
 
@@ -9,6 +13,10 @@
         padding:       5px;
         border:        2px var(--border) solid;
         text-wrap:     wrap;
-        max-width: 100vw;
+        overflow-wrap: break-word;
+        position: relative;
+        overflow: auto;
+        box-sizing:    border-box;
+        max-width:     100vw;
     }
 </style>
