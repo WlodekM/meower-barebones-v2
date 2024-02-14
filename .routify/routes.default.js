@@ -97,6 +97,20 @@ export default {
     },
     {
       "meta": {},
+      "id": "_default_debug_svelte",
+      "name": "debug",
+      "file": {
+        "path": "src/routes/debug.svelte",
+        "dir": "src/routes",
+        "base": "debug.svelte",
+        "ext": ".svelte",
+        "name": "debug"
+      },
+      "asyncModule": () => import('../src/routes/debug.svelte'),
+      "children": []
+    },
+    {
+      "meta": {},
       "id": "_default_home_svelte",
       "name": "home",
       "file": {

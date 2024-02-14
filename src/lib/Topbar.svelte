@@ -7,9 +7,12 @@
 <div class="top">
     <h1 id="logo" on:click={()=>{$goto("/home")}}>Meower Barebones</h1>
     <div class="links">
-        <button class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}>Home</button>
-        <button class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}>Chats</button>
-        <button class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}}>Credits</button>
+        <button class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}    disabled={!$isLoggedIn}>Home</button>
+        <button class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}   disabled={!$isLoggedIn}>Chats</button>
+        <button class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}} disabled={!$isLoggedIn}>Credits</button>
+        {#if $user.debug}
+            <button class:bold={$isActive("/debug") ? "bold" : "normal"} on:click={()=>{$goto("/debug")}} disabled={!$isLoggedIn}>Debug</button>
+        {/if}
         <a href="{`/users/${$user.name}`}">
             <button class:bold={$isActive("/credits") ? "bold" : "normal"}>Settings</button>
         </a>
