@@ -16,6 +16,24 @@ export default {
   "routifyDir": import.meta.url,
   "children": [
     {
+      "meta": {
+        "dynamic": true,
+        "order": false,
+        "dynamicSpread": true
+      },
+      "id": "_default_____404__svelte",
+      "name": "[...404]",
+      "file": {
+        "path": "src/routes/[...404].svelte",
+        "dir": "src/routes",
+        "base": "[...404].svelte",
+        "ext": ".svelte",
+        "name": "[...404]"
+      },
+      "asyncModule": () => import('../src/routes/[...404].svelte'),
+      "children": []
+    },
+    {
       "meta": {},
       "id": "_default_chats",
       "name": "chats",
@@ -166,24 +184,6 @@ export default {
           "children": []
         }
       ]
-    },
-    {
-      "meta": {
-        "dynamic": true,
-        "dynamicSpread": true,
-        "order": false,
-        "inline": false
-      },
-      "name": "[...404]",
-      "file": {
-        "path": ".routify/components/[...404].svelte",
-        "dir": ".routify/components",
-        "base": "[...404].svelte",
-        "ext": ".svelte",
-        "name": "[...404]"
-      },
-      "asyncModule": () => import('./components/[...404].svelte'),
-      "children": []
     }
   ]
 }
