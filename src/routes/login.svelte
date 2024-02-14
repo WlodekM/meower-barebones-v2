@@ -1,9 +1,10 @@
 <script>
-    import { sendCmd, link, connected, connect } from "@/lib/clm"
+    import { sendCmd, link, connected, meowerRequest } from "@/lib/clm"
     import { linkUrl } from "@/lib/urls.js";
     import { goto } from "@roxi/routify"
     import { isLoggedIn, isGuest, user } from "@/lib/stores.js"
     let username, password
+    let status = ""
     let passwordShown = false
     $: type = passwordShown ? 'text' : 'password'
 </script>
@@ -22,10 +23,57 @@
             $isGuest = !password
             $isLoggedIn = true
             if (!$isGuest) {
-                sendCmd("authpswd", {
-                    "username": username,
-                    "pswd": password,
+                status = "Logging in"
+                localStorage.setItem("meower_savedusername", username);
+                localStorage.setItem("meower_savedpassword", password);
+                try {
+                    await meowerRequest({
+                    "cmd": "direct",
+                    "val": {
+                        cmd: "authpswd",
+                        val: {
+                            "username": username,
+                            "pswd": password,
+                        },
+                    }
                 })
+                } catch (statusCode) {
+                    switch (statusCode) {
+                        case "E:103 | ID not found":
+                            status = "Invalid username!";
+                            return;
+                        case "E:025 | Deleted":
+                            status = "This account has been deleted!";
+                            return;
+                        case "I:011 | Invalid Password":
+                            status = "Invalid password!";
+                            return;
+                        case "E:018 | Account Banned":
+                            status = "";
+                            return;
+                        case "E:019 | Illegal characters detected":
+                            status =
+                                "Usernames must not have spaces or other special characters!";
+                            return;
+                        case "E:106 | Too many requests":
+                            status = "Too many requests! Please try again later.";
+                            return;
+                        default:
+                            status = `Uncaught ${e} error!`
+                    }
+                }
+                //@ts-ignore
+                if (window.mixins) {
+                    //@ts-ignore
+                    if (typeof window.mixins != "array") window.mixins = []
+                    //@ts-ignore
+                    window.mixins.forEach(mixin => {
+                        if(mixin.type == "onLogin") {
+                            mixin.function()
+                        }
+                    });
+                }
+                status = ""
                 $goto("/")
             } else {
                 $isLoggedIn = true
@@ -54,6 +102,10 @@
                 <input type="checkbox" name="Show password" id="showpass" bind:checked={passwordShown}>
             </div>
             <input type="submit" value="Log in">
+            <br>
+            {#key status}
+                {status}
+            {/key}
         </form>
     </div>
 </div>

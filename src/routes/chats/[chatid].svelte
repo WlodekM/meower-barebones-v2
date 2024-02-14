@@ -8,7 +8,7 @@
     import Container from "@/lib/Container.svelte"
     import Post from "@/lib/Post.svelte";
     import * as clm from "@/lib/clm.js";
-    import PostList from "@/lib/postList.svelte";
+    import PostList from "@/lib/PostList.svelte";
     onMount(async () => {
 		if ($params.chatid === "livechat") {
 			chat.set({
@@ -125,6 +125,17 @@
             console.log("hi mom")
             let post = postContent.value + " "
             // post = emojify(post)
+            //@ts-ignore
+            if (window.mixins) {
+                //@ts-ignore
+                if (typeof window.mixins != "array") window.mixins = []
+                //@ts-ignore
+                window.mixins.forEach(mixin => {
+                    if(mixin.type == "prePost") {
+                        post = mixin.function()
+                    }
+                });
+            }
             if ($isGuest) {
                 // fetch('https://webhooks.meower.org/post/home', {
                 //     method: 'POST',
@@ -142,6 +153,17 @@
                 })
                 postContent.value = ""
             }
+		//@ts-ignore
+		if (window.mixins) {
+			//@ts-ignore
+			if (typeof window.mixins != "array") window.mixins = []
+			//@ts-ignore
+			window.mixins.forEach(mixin => {
+				if(mixin.type == "onPost") {
+					mixin.function()
+				}
+			});
+		}
         }}>Post!</button>
     </div>
     <PostList path={`posts/${$params.chatid}`} origin={$chat._id} />

@@ -51,3 +51,42 @@ export let authHeader = writable({
     username: null,
     token: null,
 })
+
+//@ts-ignore
+window.stores = {}
+isLoggedIn.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.isLoggedIn = value
+})
+isGuest.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.isGuest = value
+})
+user.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.user = value
+})
+chats.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.chats = value
+})
+ulist.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.ulist = value
+})
+page.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.page = value
+})
+ulist.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.ulist = value
+})
+chat.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.chat = value
+})
+authHeader.subscribe((value)=>{
+    //@ts-ignore
+    window.stores.authHeader = value
+})

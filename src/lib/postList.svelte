@@ -3,7 +3,8 @@
     import Post from "./Post.svelte";
     import { link } from "./clm";
     import { apiUrl } from '@/lib/urls.js'
-    import { authHeader } from "./stores.js";
+    import { authHeader, user } from "./stores.js";
+    import Container from "./Container.svelte"
 
     export const path = '/home'
     export const origin = "home"
@@ -46,6 +47,7 @@
 
     let destroy = () => {}
 
+    if(destroy) destroy()
     onMount(()=>{
         console.log("mounted")
         const eventID = link.on("direct", (cmd) => {
@@ -53,7 +55,9 @@
             if (!cmd.val) return;
             if (cmd.val["post_origin"] == origin) {
                 console.log("New post!!1!11111!1!!!1!1!!1!!!1!1!1")
-                posts.unshift(cmd.val)
+                let temp = posts
+                temp.unshift(cmd.val)
+                posts = temp
             } else if (cmd.val["post_origin"]) console.log(cmd.val["post_origin"])
             if (cmd.val.mode == "delete") {
                 let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
@@ -84,6 +88,12 @@
 	}
 </script>
 {#key posts}
+    {#if $user.debug}
+        <Container style="margin-top: 10px;">
+            <h2 style="margin: 0;margin-bottom: 8px;">Debug info</h2>
+            Rendered {posts.length} posts at {new Date()}
+        </Container>
+    {/if}
     {#each posts.map(postsMapThing) as post}
         <Post post={post} />
     {/each}
