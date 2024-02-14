@@ -21,7 +21,7 @@
 					return tail.match(/[a-zA-Z0-9-_]{1,20}/gs)[0].length;
 				},
 				normalize: function (match) {
-					match.url = window.location.host + "/users/" + match.url.replace(/^@/, '');
+					match.url = "/users/" + match.url.replace(/^@/, '');
 				}
 			});
 			const tokens = md.parse(input.replaceAll(/\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs, "").replaceAll(/\*\*\*\*/gs, "\\*\\*\\*\\*"));
@@ -86,7 +86,6 @@
 				},
 				normalize: function (match) {
 					match.url =
-						window.location.host +
 						"/users/" +
 						match.url.replace(/^@/, "");
 				},
