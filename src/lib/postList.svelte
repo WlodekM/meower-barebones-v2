@@ -10,6 +10,7 @@
     export const origin = "home"
 
     let queryParams = {}
+    let postInput
     
 	/**
 	 * Loads posts

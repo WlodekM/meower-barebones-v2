@@ -3,9 +3,11 @@
 	import MarkdownIt from "markdown-it";
     import hljs from "highlight.js";
     import Container from "@/lib/Container.svelte";
+	import { IMAGE_HOST_WHITELIST } from "./whitelist";
     import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
     import { ulist, user } from "./stores"
     export let post;
+    export let input;
 
     // yoink
 	function markdown(input) {
@@ -90,9 +92,15 @@
 						match.url.replace(/^@/, "");
 				},
 			});
+			const regexPattern = /\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs;
+
+			// Caht gtp
+			content = content.replace(regexPattern, '![image.png]($2)');
+
+			// console.log(content)
 			const tokens = md.parse(
 				content
-					.replaceAll(/\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs, "")
+					.replaceAll(/\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs, `![IMAGE]()`)
 					.replaceAll(/\*\*\*\*/gs, "\\*\\*\\*\\*"),
 				{}
 			);
@@ -104,9 +112,12 @@
 								attr => attr[0] === "src"
 							);
 							if (
-								true
+								!IMAGE_HOST_WHITELIST.some(o =>
+									childToken.attrs[srcPos][1].toLowerCase().startsWith(o.toLowerCase())
+								) && $user.whitelist_enabled
 							) {
 								childToken.attrs[srcPos][1] = "about:blank";
+								childToken.children[0].content = `[Image blocked]`;
 								console.log(childToken);
 							}
 						}
@@ -172,7 +183,7 @@
 
 </script>
 <div class="post container">
-    <div class="post-header">
+    <div class="post-header" style="width: 100%;">
         <UsernameDisplay member={post.u} showOnline={false} />
 		{#if post.bridged}
 			<badge>BRIDGED</badge>
@@ -185,6 +196,27 @@
 		{#if $ulist.includes(post.u)}
 			<div class="online"></div>
 		{/if}
+		<div id="spacer" style="width: 100%;"></div>
+		<button
+			disabled={!input}
+			on:click={() => {
+				let existingText = input.value;
+
+				const mentionRegex =
+					/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
+				const mention = `@${post.user} [${post.post_id}] `;
+
+				if (mentionRegex.test(existingText)) {
+					input.value = existingText
+						.trim()
+						.replace(mentionRegex, mention);
+				} else {
+					input.value = mention + existingText.trim();
+				}
+
+				input.focus();
+			}}
+		>reply</button>
     </div>
     <p>
         <!-- {@html marked(post.p)} -->

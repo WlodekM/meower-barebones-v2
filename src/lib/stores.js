@@ -32,7 +32,8 @@ export let user = writable({
         expires: 0,
         reason: "",
     },
-    xss: false
+    xss: false,
+    whitelist_enabled: true,
 });
 export let chats = writable([])
 export let ulist = writable([])

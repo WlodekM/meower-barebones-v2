@@ -1,0 +1,3 @@
+lib/Post.svelte, lib/whitelist.js
+
+Enable/disable whitelist setting
