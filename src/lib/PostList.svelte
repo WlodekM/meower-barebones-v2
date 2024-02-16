@@ -1,16 +1,21 @@
 <script>
     import { onDestroy, onMount } from "svelte"
     import Post from "./Post.svelte";
-    import { link } from "./clm";
+    import * as clm from "./clm";
     import { apiUrl } from '@/lib/urls.js'
-    import { authHeader, user } from "./stores.js";
+    import { authHeader, user, isGuest, isLoggedIn } from "./stores.js";
     import Container from "./Container.svelte"
+	import { emojify } from "@/lib/emojis.js";
 
     export const path = '/home'
     export const origin = "home"
+    export const chat = "home"
+    export const enablePosting = true
 
     let queryParams = {}
     let postInput
+    let postError = ""
+	// let postContent = ""
     
 	/**
 	 * Loads posts
@@ -51,7 +56,7 @@
     if(destroy) destroy()
     onMount(()=>{
         console.log("mounted")
-        const eventID = link.on("direct", (cmd) => {
+        const eventID = clm.link.on("direct", (cmd) => {
             console.log("cmd", cmd)
             if (!cmd.val) return;
             if (cmd.val["post_origin"] == origin) {
@@ -67,7 +72,7 @@
         })
         destroy = ()=>{
             console.log("destroyed")
-            link.off(eventID)
+            clm.link.off(eventID)
         }
     })
     onDestroy(destroy)
@@ -88,14 +93,84 @@
 		return thePost
 	}
 </script>
-{#key posts}
-    {#if $user.debug}
-        <Container style="margin-top: 10px;">
-            <h2 style="margin: 0;margin-bottom: 8px;">Debug info</h2>
-            Rendered {posts.length} posts at {new Date()}
-        </Container>
-    {/if}
-    {#each posts.map(postsMapThing) as post}
-        <Post post={post} />
-    {/each}
-{/key}
+<div class="posting">
+    <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
+    <textarea rows="2" class="type-message" bind:this={postInput}></textarea>
+    <button id="postbutton" on:click={()=>{
+		console.log("hi mom")
+		let post = postInput.value + " "
+		post = emojify(post)
+		//@ts-ignore
+		if (window.mixins) {
+			//@ts-ignore
+			if (typeof window.mixins != "array") window.mixins = []
+			//@ts-ignore
+			window.mixins.forEach(mixin => {
+				if(mixin.type == "prePost") {
+					post = mixin.function()
+				}
+			});
+		}
+        if ($isGuest && chat != "home") return;
+		if ($isGuest) {
+			fetch('https://webhooks.meower.org/post/home', {
+				method: 'POST',
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ "post": post, "username": $user.name })
+			}).then(response => response.text())
+            postInput.value = ""
+		}
+        if(chat == "home") {
+            clm.sendCmd("post_home", post).catch((err) => {
+                postError = `Error when posting: "${err}"`
+            })
+        } else {
+            clm.sendCmd("post_chat", {chatid: chat, p: post}).catch((err) => {
+                postError = `Error when posting: "${err}"`
+            })
+        }
+        if (postError) {
+            //@ts-ignore
+            if (window.mixins) {
+                //@ts-ignore
+                if (typeof window.mixins != "array") window.mixins = []
+                //@ts-ignore
+                window.mixins.forEach(mixin => {
+                    if(mixin.type == "onPostError") {
+                        mixin.function(post)
+                    }
+                });
+            }
+            return
+        }
+        postInput.value = ""
+		//@ts-ignore
+		if (window.mixins) {
+			//@ts-ignore
+			if (typeof window.mixins != "array") window.mixins = []
+			//@ts-ignore
+			window.mixins.forEach(mixin => {
+				if(mixin.type == "onPosted") {
+					mixin.function(post)
+				}
+			});
+		}
+	}}>Post!</button>
+</div>
+
+<div id="posts">
+    {#key posts}
+        {#if $user.debug}
+            <Container style="margin-top: 10px;">
+                <h2 style="margin: 0;margin-bottom: 8px;">Debug info</h2>
+                Rendered {posts.length} posts at {new Date()}
+            </Container>
+        {/if}
+        {#each posts.map(postsMapThing) as post}
+            <Post post={post} />
+        {/each}
+    {/key}
+</div>

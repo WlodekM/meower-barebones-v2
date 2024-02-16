@@ -197,26 +197,27 @@
 			<div class="online"></div>
 		{/if}
 		<div id="spacer" style="width: 100%;"></div>
-		<button
-			disabled={!input}
-			on:click={() => {
-				let existingText = input.value;
+		{#if input}
+			<button
+				on:click={() => {
+					let existingText = input.value;
 
-				const mentionRegex =
-					/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
-				const mention = `@${post.user} [${post.post_id}] `;
+					const mentionRegex =
+						/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
+					const mention = `@${post.user} [${post.post_id}] `;
 
-				if (mentionRegex.test(existingText)) {
-					input.value = existingText
-						.trim()
-						.replace(mentionRegex, mention);
-				} else {
-					input.value = mention + existingText.trim();
-				}
+					if (mentionRegex.test(existingText)) {
+						input.value = existingText
+							.trim()
+							.replace(mentionRegex, mention);
+					} else {
+						input.value = mention + existingText.trim();
+					}
 
-				input.focus();
-			}}
-		>reply</button>
+					input.focus();
+				}}
+			>reply</button>
+		{/if}
     </div>
     <p>
         <!-- {@html marked(post.p)} -->

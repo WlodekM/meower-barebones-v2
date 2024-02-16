@@ -1,0 +1,10 @@
+/
+/chats
+/chats/index
+/credits
+/debug
+/home
+/index
+/login
+/logout
+/users

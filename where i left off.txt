@@ -1,3 +1,6 @@
-lib/Post.svelte, lib/whitelist.js
+lib/Post.svelte, lib/PostList.svelte
 
-Enable/disable whitelist setting
+Replies
+ |
+ |- Post input will be in PostList now
+ \
