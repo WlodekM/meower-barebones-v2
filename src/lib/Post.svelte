@@ -204,7 +204,8 @@
 
 					const mentionRegex =
 						/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
-					const mention = `@${post.user} [${post.post_id}] `;
+					const mention = `@${post.u} [${post.post_id}] `;
+					console.log(post, post.u)
 
 					if (mentionRegex.test(existingText)) {
 						input.value = existingText
