@@ -7,10 +7,14 @@
     import Container from "./Container.svelte"
 	import { emojify } from "@/lib/emojis.js";
 
-    export const path = '/home'
-    export const origin = "home"
-    export const chat = "home"
-    export const enablePosting = true
+    export let path = '/home'
+    export let origin = "home"
+    export let chat = "home"
+    export let enablePosting = true
+
+    console.log(path)
+
+    let id = 0;
 
     let queryParams = {}
     let postInput
@@ -27,6 +31,7 @@
             page: page.toString(),
             ...queryParams,
         }).toString();
+        console.log(`${apiUrl}${path}?${params}`)
         const resp = await fetch(`${apiUrl}${path}?${params}`, {headers: $authHeader})
         if (!resp.ok) {
             throw new Error('Response code is not OK; code is ' + resp.status)
@@ -92,6 +97,18 @@
         }
 		return thePost
 	}
+
+    function postPost(content, postOrigin) {
+        fetch(`${apiUrl}${postOrigin == "home" ? "home" : `posts/${postOrigin}`}`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                ...$authHeader
+            },
+            body: JSON.stringify({content})
+        }).then(response => response.text())
+        postInput.value = ""
+    }
 </script>
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
@@ -111,27 +128,31 @@
 				}
 			});
 		}
-        if ($isGuest && chat != "home") return;
-		if ($isGuest) {
-			fetch('https://webhooks.meower.org/post/home', {
-				method: 'POST',
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ "post": post, "username": $user.name })
-			}).then(response => response.text())
-            postInput.value = ""
-		}
-        if(chat == "home") {
-            clm.sendCmd("post_home", post).catch((err) => {
-                postError = `Error when posting: "${err}"`
-            })
-        } else {
-            clm.sendCmd("post_chat", {chatid: chat, p: post}).catch((err) => {
-                postError = `Error when posting: "${err}"`
-            })
-        }
+        // if ($isGuest && chat != "home") return;
+		// if ($isGuest) {
+		// 	fetch('https://webhooks.meower.org/post/home', {
+		// 		method: 'POST',
+		// 		headers: {
+		// 			'Accept': 'application/json',
+		// 			'Content-Type': 'application/json'
+		// 		},
+		// 		body: JSON.stringify({ "post": post, "username": $user.name })
+		// 	}).then(response => response.text())
+        //     postInput.value = ""
+		// }
+        // if(chat == "home") {
+		// 	fetch(`${apiUrl}${path}`, {
+		// 		method: 'POST',
+		// 		headers: $authHeader,
+		// 		body: JSON.stringify({"post": post})
+		// 	}).then(response => response.text())
+        //     postInput.value = ""
+        // } else {
+        //     clm.sendCmd("post_chat", {chatid: chat, p: post}).catch((err) => {
+        //         postError = `Error when posting: "${err}"`
+        //     })
+        // }
+        postPost(post, origin)
         if (postError) {
             //@ts-ignore
             if (window.mixins) {
@@ -170,7 +191,7 @@
             </Container>
         {/if}
         {#each posts.map(postsMapThing) as post}
-            <Post post={post} />
+            <Post post={post} input={postInput} />
         {/each}
     {/key}
 </div>

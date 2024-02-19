@@ -12,9 +12,10 @@
         "",
         "/",
         "/logout",
-        "/logout/"
+        "/logout/",
+        "/chats"
     ]
-    if(!$isLoggedIn && requiredLoginPaths.includes(window.location?.pathname)) {
+    if(!$isLoggedIn && requiredLoginPaths.some((a)=>window.location?.pathname.startsWith(a))) {
         $goto("/login")
     }
 </script>

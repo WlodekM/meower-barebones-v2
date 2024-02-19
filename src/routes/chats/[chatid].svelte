@@ -95,7 +95,7 @@
 
 <Topbar />
 
-<div style="padding: 8px;">
+<div style="padding: 10px;padding-bottom: 0;">
     <Container>
         {@const members = $chat.members.length > 50
             ? $chat.members.slice(0, 49)
@@ -117,54 +117,5 @@
             {/each}
         </details>
     </Container>
-    <!-- 👍 -->
-    <div class="posting" style="margin: 0;">
-        <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
-        <textarea rows="2" class="type-message" bind:this={postContent}></textarea>
-        <button id="postbutton" on:click={()=>{
-            console.log("hi mom")
-            let post = postContent.value + " "
-            // post = emojify(post)
-            //@ts-ignore
-            if (window.mixins) {
-                //@ts-ignore
-                if (typeof window.mixins != "array") window.mixins = []
-                //@ts-ignore
-                window.mixins.forEach(mixin => {
-                    if(mixin.type == "prePost") {
-                        post = mixin.function()
-                    }
-                });
-            }
-            if ($isGuest) {
-                // fetch('https://webhooks.meower.org/post/home', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Accept': 'application/json',
-                //         'Content-Type': 'application/json'
-                //     },
-                //     body: JSON.stringify({ "post": post, "username": $user.name })
-                // })
-                //     .then(response => response.text())
-                postContent.value = ""
-            } else {
-                clm.sendCmd("post_chat", {chatid: $params.chatid, p: post}).catch((err) => {
-                    postError = `Error when posting: "${err}"`
-                })
-                postContent.value = ""
-            }
-		//@ts-ignore
-		if (window.mixins) {
-			//@ts-ignore
-			if (typeof window.mixins != "array") window.mixins = []
-			//@ts-ignore
-			window.mixins.forEach(mixin => {
-				if(mixin.type == "onPosted") {
-					mixin.function()
-				}
-			});
-		}
-        }}>Post!</button>
-    </div>
-    <PostList path={`posts/${$params.chatid}`} origin={$chat._id} />
 </div>
+<PostList path={`posts/${$params.chatid}`} origin={$chat._id} chat={$chat._id} />
