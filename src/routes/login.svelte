@@ -76,8 +76,8 @@
                 status = ""
                 $goto("/")
             } else {
-                $isLoggedIn = true
-                $goto("/")
+                status = "Guests users are no longer supported"
+                return
             }
         }}>
             <div class="form-section">
