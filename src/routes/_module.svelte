@@ -18,8 +18,6 @@
     if(!$isLoggedIn && requiredLoginPaths.some((a)=>window.location?.pathname.startsWith(a))) {
         $goto("/login")
     }
-    //TODO - Do better code ¯\_(ツ)_/¯
-    let _user
     function waitForElm(selector) {
         return new Promise(resolve => {
             if (document.querySelector(selector)) {
@@ -39,21 +37,11 @@
             });
         });
     }
-    user.subscribe((v)=>{
-        _user = v
-        waitForElm("#css").then(el => {
-            if(el) {
-                el.innerText = _user.layout.css
-            } else {console.log("no #css?")}
-        })
-    })
 </script>
 
 <ProgressBar />
 
-<div>
-    {#key $user}
-        <style id="css"></style>
-    {/key}
-    <slot />
-</div>
+{#key $user.layout}
+    {@html `<style>${$user.layout.css}</style>`}
+{/key}
+<slot />
