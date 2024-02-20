@@ -120,6 +120,7 @@
 
 		return renderedContent;
 	}
+	let _layout = $user.layout
 </script>
 
 <Topbar />
@@ -165,15 +166,16 @@
 				<br>
                 CSS theme: 
 				<br>
-				<textarea name="mbb" bind:value={$user.layout.css} 
-                    on:change={(e) => {
-						console.log($user.layout.css, e)
-							clm.updateProfile({
-								layout: $user.layout,
-							})
-						}
-					}
-                /><br>
+				<form 
+				on:submit={(e) => {
+					e.preventDefault()
+					clm.updateProfile({
+						layout: _layout,
+					})
+				}}>
+					<textarea name="mbb" bind:value={_layout.css} style="width: 100%;" /><br>
+					<input type="submit" value="Save">
+				</form>
             </Container>
         </div>
     {/if}
