@@ -156,11 +156,12 @@
         <div style="padding: 8px;">
             <Container>
                 <h2 style="margin: 0;margin-bottom: 8px;">Settings</h2>
-                Enable xss: <input type="checkbox" name="XSS" checked={$user.xss} 
-                    on:click={() =>
+                Enable xss: <input type="checkbox" name="XSS" checked={_layout.xss} 
+                    on:click={() =>{
+						_layout.xss = _layout.xss === true ? false : true;
                         clm.updateProfile({
-                            xss: $user.xss === true ? false : true,
-                        })}
+                            layout: _layout
+                        })}}
                 /><br>
                 XSS is currently {($user.xss ?? false) ? "enabled" : "disabled"}
 				<br>
