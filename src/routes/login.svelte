@@ -2,7 +2,7 @@
     import { sendCmd, link, connected, meowerRequest } from "@/lib/clm"
     import { linkUrl } from "@/lib/urls.js";
     import { goto } from "@roxi/routify"
-    import { isLoggedIn, isGuest, user } from "@/lib/stores.js"
+    import { isLoggedIn, isGuest, user, authHeader } from "@/lib/stores.js"
     let username, password
     let status = ""
     let passwordShown = false
@@ -17,9 +17,6 @@
         <form class="form left" style="width: 100%;" id="loginForm" on:submit={async (e)=>{
             e.preventDefault();
             if (!username) return
-            // let res = await fetch("https://api.meower.org/users/${username}")
-            // const json = res.json() ?? {}
-            // $user = json
             $isGuest = !password
             $isLoggedIn = true
             if (!$isGuest) {
@@ -73,6 +70,53 @@
                         }
                     });
                 }
+                let res = await fetch(`https://api.meower.org/users/${username}`,
+                {
+                    headers: $authHeader,
+                })
+                const json = await res.json() ?? {
+                    name: null,
+                    flags: 0,
+                    permissions: 0,
+                    unread_inbox: false,
+                    theme: "orange",
+                    mode: true,
+                    sfx: true,
+                    bgm: false,
+                    bgm_song: 2,
+                    debug: false,
+                    hide_blocked_users: false,
+                    favorited_chats: [],
+                    embeds_enabled: true,
+                    pfp_data: 1,
+                    quote: "",
+                    ban: {
+                        state: "None",
+                        expires: 0,
+                        reason: "",
+                    },
+                    xss: false,
+                    whitelist_enabled: true,
+                    layout: {css: ""}
+                }
+                console.log("asfinuan")
+                if(!json.name && json._id) {
+                    json.name = json._id
+                }
+                console.log("asfinuan 2")
+                function isJsonString(str) {
+                    try {
+                        JSON.parse(str);
+                    } catch (e) {
+                        return false;
+                    }
+                    return true;
+                }
+                if(isJsonString(json.layout)) {
+                    json.layout = JSON.parse(json.layout)
+                }
+                $user = json
+                console.log($user)
                 status = ""
                 $goto("/")
             } else {

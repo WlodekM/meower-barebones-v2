@@ -112,8 +112,7 @@
         <details>
             <summary style="cursor: pointer;">Members</summary>
             {#each members as member}
-                <UsernameDisplay member={member} />
-                {#if members.indexOf(member) != members.length -1},&nbsp;{/if}
+                <UsernameDisplay member={member} />{#if members.indexOf(member) != members.length -1},&nbsp;{/if}
             {/each}
         </details>
     </Container>

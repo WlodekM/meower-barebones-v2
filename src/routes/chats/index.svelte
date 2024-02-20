@@ -27,8 +27,9 @@
                         ? chat.members.slice(0, 9)
                         : chat.members}
                     Members: {#each members as member}
-                        <UsernameDisplay member={member} />
-                        {#if members.indexOf(member) != members.length -1},&nbsp;{/if}
+                        <span>
+                            <UsernameDisplay member={member} />{#if members.indexOf(member) != members.length -1},&nbsp;{/if}
+                        </span>
                     {/each}
                     {#if chat.members.length > 10}
                         ...

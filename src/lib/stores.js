@@ -12,6 +12,7 @@ export let isLoggedIn = writable(false);
 export let isGuest = writable(false);
 export let user = writable({
     name: null,
+    _id: null,
     flags: 0,
     permissions: 0,
     unread_inbox: false,
@@ -20,7 +21,6 @@ export let user = writable({
     sfx: true,
     bgm: false,
     bgm_song: 2,
-    layout: "new",
     debug: false,
     hide_blocked_users: false,
     favorited_chats: [],
@@ -34,6 +34,7 @@ export let user = writable({
     },
     xss: false,
     whitelist_enabled: true,
+    layout: {css: ""}
 });
 export let chats = writable([])
 export let ulist = writable([])

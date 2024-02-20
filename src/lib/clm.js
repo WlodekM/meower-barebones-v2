@@ -28,7 +28,9 @@ let _user = {
     sfx: true,
     bgm: false,
     bgm_song: 2,
-    layout: "new",
+    layout: {
+        css: ""
+    },
     debug: false,
     hide_blocked_users: false,
     favorited_chats: [],
@@ -40,7 +42,6 @@ let _user = {
         expires: 0,
         reason: "",
     },
-    xss: false
 };
 chats.subscribe(v => {
 	_chats = v;
@@ -215,6 +216,9 @@ export async function updateProfile(updatedValues) {
 	if (!_user.name) return;
 	Object.assign(_user, updatedValues);
 	user.set(_user);
+    if(updatedValues.layout) {
+        updatedValues.layout = JSON.stringify(updatedValues.layout)
+    }
 	return meowerRequest({
 		cmd: "direct",
 		val: {

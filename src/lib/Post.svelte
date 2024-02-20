@@ -3,6 +3,7 @@
 	import MarkdownIt from "markdown-it";
     import hljs from "highlight.js";
     import Container from "@/lib/Container.svelte";
+	import FormattedDate from "./FormattedDate.svelte";
 	import { IMAGE_HOST_WHITELIST } from "./whitelist";
     import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
     import { ulist, user } from "./stores"
@@ -220,18 +221,24 @@
 			>reply</button>
 		{/if}
     </div>
-    <p>
-        <!-- {@html marked(post.p)} -->
-        {#await ($user.xss ? markdown : addFancyElements)(post.p) then content}
-            {@html content}
-        {/await}
-    </p>
+	<div class="post-time">
+		<FormattedDate date={post.t.e} />
+	</div>
+	<!-- {@html marked(post.p)} -->
+	{#await ($user.xss ? markdown : addFancyElements)(post.p) then content}
+		{@html content}
+	{/await}
     <div class="post-images" id="{post["post_id"]}-images"></div>
 </div>
 
 <style>
+	:global(.post p) {
+		margin: 0;
+	}
+
     .post {
         margin-top: 10px;
+		word-wrap: break-word;
     }
 
 	.online {

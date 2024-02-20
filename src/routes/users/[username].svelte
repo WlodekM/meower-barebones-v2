@@ -1,6 +1,7 @@
 <script>
 	import { apiUrl, encodeApiURLParams } from "@/lib/urls.js";
 	import { params, goto } from "@roxi/routify";
+	import { authHeader } from "@/lib/stores.js";
     import { ulist, user } from "@/lib/stores";
     import * as clm from "@/lib/clm.js";
     import Topbar from "@/lib/Topbar.svelte";
@@ -10,17 +11,37 @@
 
     const PFP_COUNT = 34;
 
+	function isJsonString(str) {
+		try {
+			JSON.parse(str);
+		} catch (e) {
+			return false;
+		}
+		return true;
+	}
+
     const pfps = new Array(PFP_COUNT).fill().map((_, i) => i + 1);
     let pfpSwitcher = false;
 
     async function loadProfile() {
         let path = `users/${$params.username}`;
         if (encodeApiURLParams) path = encodeURIComponent(path);
-        const resp = await fetch(`${apiUrl}${path}`);
+        const resp = await fetch(`${apiUrl}${path}`, 
+			{
+				headers: $authHeader,
+			});
         if (!resp.ok) {
             throw new Error("Response code is not OK; code is " + resp.status);
         }
         const json = await resp.json();
+		if(isJsonString(json.layout)) {
+			json.layout = JSON.parse(json.layout)
+		} else {
+			clm.updateProfile({
+				layout: {css: ""}
+			})
+		}
+		console.log(json)
         return json;
     }
     async function addFancyElements(content) {
@@ -141,6 +162,18 @@
                         })}
                 /><br>
                 XSS is currently {($user.xss ?? false) ? "enabled" : "disabled"}
+				<br>
+                CSS theme: 
+				<br>
+				<textarea name="mbb" bind:value={$user.layout.css} 
+                    on:change={(e) => {
+						console.log($user.layout.css, e)
+							clm.updateProfile({
+								layout: $user.layout,
+							})
+						}
+					}
+                /><br>
             </Container>
         </div>
     {/if}
