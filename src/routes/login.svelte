@@ -3,10 +3,124 @@
     import { linkUrl } from "@/lib/urls.js";
     import { goto } from "@roxi/routify"
     import { isLoggedIn, isGuest, user, authHeader } from "@/lib/stores.js"
+    import { onMount } from "svelte"
     let username, password
     let status = ""
     let passwordShown = false
     $: type = passwordShown ? 'text' : 'password'
+    async function doLogin(username, password, cb) {
+        status = "Logging in"
+        localStorage.setItem("meower_savedusername", username);
+        localStorage.setItem("meower_savedpassword", password);
+        try {
+            await meowerRequest({
+            "cmd": "direct",
+            "val": {
+                cmd: "authpswd",
+                val: {
+                    "username": username,
+                    "pswd": password,
+                },
+            }
+        })
+        } catch (statusCode) {
+            switch (statusCode) {
+                case "E:103 | ID not found":
+                    status = "Invalid username!";
+                    return;
+                case "E:025 | Deleted":
+                    status = "This account has been deleted!";
+                    return;
+                case "I:011 | Invalid Password":
+                    status = "Invalid password!";
+                    return;
+                case "E:018 | Account Banned":
+                    status = "";
+                    return;
+                case "E:019 | Illegal characters detected":
+                    status =
+                        "Usernames must not have spaces or other special characters!";
+                    return;
+                case "E:106 | Too many requests":
+                    status = "Too many requests! Please try again later.";
+                    return;
+                default:
+                    status = `Uncaught  error!`
+            }
+        }
+        //@ts-ignore
+        if (window.mixins) {
+            //@ts-ignore
+            if (typeof window.mixins != "array") window.mixins = []
+            //@ts-ignore
+            window.mixins.forEach(mixin => {
+                if(mixin.type == "onLogin") {
+                    mixin.function()
+                }
+            });
+        }
+        let res = await fetch(`https://api.meower.org/users/${username}`,
+        {
+            headers: $authHeader,
+        })
+        const json = await res.json() ?? {
+            name: null,
+            flags: 0,
+            permissions: 0,
+            unread_inbox: false,
+            theme: "orange",
+            mode: true,
+            sfx: true,
+            bgm: false,
+            bgm_song: 2,
+            debug: false,
+            hide_blocked_users: false,
+            favorited_chats: [],
+            embeds_enabled: true,
+            pfp_data: 1,
+            quote: "",
+            ban: {
+                state: "None",
+                expires: 0,
+                reason: "",
+            },
+            xss: false,
+            whitelist_enabled: true,
+            layout: {css: ""}
+        }
+        console.log("asfinuan")
+        if(!json.name && json._id) {
+            json.name = json._id
+        }
+        console.log("asfinuan 2")
+        function isJsonString(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
+        if(isJsonString(json.layout)) {
+            json.layout = JSON.parse(json.layout)
+        }
+        $user = json
+        console.log($user)
+        cb()
+    }
+    link.once("connected", ()=>{
+        if (
+            localStorage.getItem("meower_savedusername") &&
+            localStorage.getItem("meower_savedpassword")
+        ) {
+            doLogin(localStorage.getItem("meower_savedusername"), localStorage.getItem("meower_savedpassword"), function() {
+                $isLoggedIn = true
+                status = ""
+                console.log("CB")
+                $goto("/")
+            })
+        }
+    })
 </script>
 
 <div class="center-vert" style="height: 100vh;">
@@ -20,105 +134,10 @@
             $isGuest = !password
             $isLoggedIn = true
             if (!$isGuest) {
-                status = "Logging in"
-                localStorage.setItem("meower_savedusername", username);
-                localStorage.setItem("meower_savedpassword", password);
-                try {
-                    await meowerRequest({
-                    "cmd": "direct",
-                    "val": {
-                        cmd: "authpswd",
-                        val: {
-                            "username": username,
-                            "pswd": password,
-                        },
-                    }
+                doLogin(username, password, function() {
+                    status = ""
+                    $goto("/")
                 })
-                } catch (statusCode) {
-                    switch (statusCode) {
-                        case "E:103 | ID not found":
-                            status = "Invalid username!";
-                            return;
-                        case "E:025 | Deleted":
-                            status = "This account has been deleted!";
-                            return;
-                        case "I:011 | Invalid Password":
-                            status = "Invalid password!";
-                            return;
-                        case "E:018 | Account Banned":
-                            status = "";
-                            return;
-                        case "E:019 | Illegal characters detected":
-                            status =
-                                "Usernames must not have spaces or other special characters!";
-                            return;
-                        case "E:106 | Too many requests":
-                            status = "Too many requests! Please try again later.";
-                            return;
-                        default:
-                            status = `Uncaught ${e} error!`
-                    }
-                }
-                //@ts-ignore
-                if (window.mixins) {
-                    //@ts-ignore
-                    if (typeof window.mixins != "array") window.mixins = []
-                    //@ts-ignore
-                    window.mixins.forEach(mixin => {
-                        if(mixin.type == "onLogin") {
-                            mixin.function()
-                        }
-                    });
-                }
-                let res = await fetch(`https://api.meower.org/users/${username}`,
-                {
-                    headers: $authHeader,
-                })
-                const json = await res.json() ?? {
-                    name: null,
-                    flags: 0,
-                    permissions: 0,
-                    unread_inbox: false,
-                    theme: "orange",
-                    mode: true,
-                    sfx: true,
-                    bgm: false,
-                    bgm_song: 2,
-                    debug: false,
-                    hide_blocked_users: false,
-                    favorited_chats: [],
-                    embeds_enabled: true,
-                    pfp_data: 1,
-                    quote: "",
-                    ban: {
-                        state: "None",
-                        expires: 0,
-                        reason: "",
-                    },
-                    xss: false,
-                    whitelist_enabled: true,
-                    layout: {css: ""}
-                }
-                console.log("asfinuan")
-                if(!json.name && json._id) {
-                    json.name = json._id
-                }
-                console.log("asfinuan 2")
-                function isJsonString(str) {
-                    try {
-                        JSON.parse(str);
-                    } catch (e) {
-                        return false;
-                    }
-                    return true;
-                }
-                if(isJsonString(json.layout)) {
-                    json.layout = JSON.parse(json.layout)
-                }
-                $user = json
-                console.log($user)
-                status = ""
-                $goto("/")
             } else {
                 status = "Guests users are no longer supported"
                 return

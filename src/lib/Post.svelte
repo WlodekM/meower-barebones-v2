@@ -254,6 +254,12 @@
 		gap: 10px;
 	}
 
+	:global(.post img) {
+		max-height: 12em;
+		max-width: 100%;
+		border-radius: 5px;
+	}
+
     /* .post div img {
         width: 150px;
         height: auto;
