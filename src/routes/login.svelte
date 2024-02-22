@@ -164,7 +164,7 @@
                 </span>
                 <input type="checkbox" name="Show password" id="showpass" bind:checked={passwordShown}>
             </div>
-            <input type="submit" value="Log in">
+            <input type="submit" value="Log in"> or <button on:click={$goto("/signup")} disabled title="Currently unavailable">Sign up</button>
             <br>
             {#key status}
                 {status}
