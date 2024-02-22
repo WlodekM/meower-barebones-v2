@@ -23,6 +23,8 @@
     const pfps = new Array(PFP_COUNT).fill().map((_, i) => i + 1);
     let pfpSwitcher = false;
 
+	let profileThemeMatch;
+	let profileTheme;
     async function loadProfile() {
         let path = `users/${$params.username}`;
         if (encodeApiURLParams) path = encodeURIComponent(path);
@@ -42,6 +44,12 @@
 			})
 		}
 		console.log(json)
+		profileThemeMatch = json.quote.match(/:mbb\{"border":"#[0-9a-fA-F]{6}","background":"#[0-9a-fA-F]{6}","sec-background":"#[0-9a-fA-F]{6}"\}$/g)
+		if(profileThemeMatch) {
+			console.log(profileThemeMatch[0], String(profileThemeMatch[0]))
+			json.quote = json.quote.replaceAll(profileThemeMatch[0], "")
+			profileTheme = JSON.parse((profileThemeMatch)[0].replace(":mbb", ""))
+		}
         return json;
     }
     async function addFancyElements(content) {
@@ -123,8 +131,9 @@
 	let _layout = $user.layout
 </script>
 
+<div style={profileTheme ? `background: ${profileTheme.background}; min-height: 100VH` : ""}>
 <Topbar />
-
+<div style={profileTheme ? `--border: ${profileTheme.border}; --secondary-bg: ${profileTheme["sec-background"]}; background: ${profileTheme.background}; --bg-light: ${profileTheme["sec-background"]}; min-height: 100%` : ""}>
 {#await loadProfile()}
     Loading...
 {:then data} 
@@ -181,3 +190,5 @@
         </div>
     {/if}
 {/await}
+</div>
+</div>
