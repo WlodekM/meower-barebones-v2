@@ -44,7 +44,7 @@
                     <button class:active={$isActive("/debug")} on:click={()=>{$goto("/debug")}} disabled={!$isLoggedIn}>Debug</button>
                 {/if}
                 <a href="{`/users/${$user.name}`}">
-                    <button class:active={$isActive(`/users/`)}>Settings</button>
+                    <button class:active={$isActive(`/users/[username]`, { username: $user.name })}>Settings</button>
                 </a>
                 <!-- divider -->
                 <span> | </span>
