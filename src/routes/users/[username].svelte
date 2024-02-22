@@ -36,12 +36,14 @@
             throw new Error("Response code is not OK; code is " + resp.status);
         }
         const json = await resp.json();
-		if(isJsonString(json.layout)) {
-			json.layout = JSON.parse(json.layout)
-		} else {
-			clm.updateProfile({
-				layout: {css: ""}
-			})
+		if(json._id == $user.name) {
+			if(isJsonString(json.layout)) {
+				json.layout = JSON.parse(json.layout)
+			} else {
+				clm.updateProfile({
+					layout: {css: ""}
+				})
+			}
 		}
 		console.log(json)
 		profileThemeMatch = json.quote.match(/:mbb\{"border":"#[0-9a-fA-F]{6}","background":"#[0-9a-fA-F]{6}","sec-background":"#[0-9a-fA-F]{6}"\}$/g)

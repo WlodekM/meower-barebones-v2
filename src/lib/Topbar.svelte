@@ -1,44 +1,74 @@
 <script>
-	import { isGuest, user, isLoggedIn, page } from '@/lib/stores.js'
-    import * as clm from "./clm.js";
+	import { isGuest, user, isLoggedIn } from '@/lib/stores.js'
     import { goto, isActive } from "@roxi/routify";
-    import { tick } from "svelte"
+    import { onMount, tick } from "svelte"
+
+    let currentPath = window.location.pathname;
+    let updater = {}
+
+    // function waitPathChange() {
+    //     return new Promise(resolve => {
+    //         const onPathChange = () => {
+    //             resolve();
+    //             window.removeEventListener('popstate', onPathChange);
+    //         };
+    //         window.addEventListener('popstate', onPathChange);
+    //     });
+    // }
+
+    // onMount(() => {
+    //     window.onpopstate = async () => {
+    //         // jank
+    //         await tick()
+    //         await waitPathChange();
+    //         currentPath = window.location.pathname;
+    //         updater = {}
+    //     };
+    // });
+
+    // function isActive(path) {
+    //     // delay(10).then()
+    //     console.log(currentPath, path, currentPath.startsWith(path))
+    //     return currentPath.startsWith(path)
+    // }
 </script>
-<div class="top">
-    <h1 id="logo" on:click={()=>{$goto("/home")}}>Meower Barebones</h1>
-    <div class="links">
-        <button class:bold={$isActive("/home") ? "bold" : "normal"}    on:click={()=>{$goto("/home")}}    disabled={!$isLoggedIn}>Home</button>
-        <button class:bold={$isActive("/chats") ? "bold" : "normal"}   on:click={()=>{$goto("/chats")}}   disabled={!$isLoggedIn}>Chats</button>
-        <button class:bold={$isActive("/credits") ? "bold" : "normal"} on:click={()=>{$goto("/credits")}} disabled={!$isLoggedIn}>Credits</button>
-        {#if $user.debug}
-            <button class:bold={$isActive("/debug") ? "bold" : "normal"} on:click={()=>{$goto("/debug")}} disabled={!$isLoggedIn}>Debug</button>
-        {/if}
-        <a href="{`/users/${$user.name}`}">
-            <button class:bold={$isActive("/credits") ? "bold" : "normal"}>Settings</button>
-        </a>
-        <!-- divider -->
-        <span> | </span>
-        {#if $isLoggedIn}
-            Logged in as {$user.name}
-            {#if $isGuest}
-                (Guest)
+{#key updater}
+    <div class="top">
+        <h1 id="logo" on:click={()=>{$goto("/home")}}>Meower Barebones</h1>
+        <div class="links">
+            {#if $isLoggedIn}
+                <button class:active={$isActive("/home")}    on:click={()=>{$goto("/home")}}    disabled={!$isLoggedIn}>Home</button>
+                <button class:active={$isActive("/chats")}   on:click={()=>{$goto("/chats")}}   disabled={!$isLoggedIn}>Chats</button>
+                <button class:active={$isActive("/credits")} on:click={()=>{$goto("/credits")}} disabled={!$isLoggedIn}>Credits</button>
+                {#if $user.debug}
+                    <button class:active={$isActive("/debug")} on:click={()=>{$goto("/debug")}} disabled={!$isLoggedIn}>Debug</button>
+                {/if}
+                <a href="{`/users/${$user.name}`}">
+                    <button class:active={$isActive(`/users/`)}>Settings</button>
+                </a>
+                <!-- divider -->
+                <span> | </span>
+                Logged in as {$user.name}
+                {#if $isGuest}
+                    (Guest)
+                {/if}
+                <button on:click={()=>{
+                    $goto("/logout")
+                }}>Log out</button>
+            {:else}
+                <span color="red">Not logged in</span>
+                <button on:click={()=>{
+                    $goto("/login")
+                }}>Log in</button>
             {/if}
-            <button on:click={()=>{
-                $goto("/logout")
-            }}>Log out</button>
-        {:else}
-            <span color="red">Not logged in</span>
-            <button on:click={()=>{
-                $goto("/login")
-            }}>Log in</button>
-        {/if}
-        <!-- <div id=spacer style="width:25px;"></div> -->
-        <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
+            <!-- <div id=spacer style="width:25px;"></div> -->
+            <!-- <label for="badwords">Show bad words:</label><input type="checkbox" id="badwords"> -->
+        </div>
     </div>
-</div>
+{/key}
 
 <style>
-    .bold {
+    .active {
         font-weight: bold;
         /* 👍 */
     }

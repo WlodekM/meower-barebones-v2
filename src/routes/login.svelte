@@ -108,17 +108,33 @@
         console.log($user)
         cb()
     }
-    link.once("connected", ()=>{
-        if (
-            localStorage.getItem("meower_savedusername") &&
-            localStorage.getItem("meower_savedpassword")
-        ) {
-            doLogin(localStorage.getItem("meower_savedusername"), localStorage.getItem("meower_savedpassword"), function() {
-                $isLoggedIn = true
-                status = ""
-                console.log("CB")
-                $goto("/")
+    onMount(()=>{
+        if(link.ws.CLOSED || link.ws.CONNECTING) {
+            link.once("connected", ()=>{
+                if (
+                    localStorage.getItem("meower_savedusername") &&
+                    localStorage.getItem("meower_savedpassword")
+                ) {
+                    doLogin(localStorage.getItem("meower_savedusername"), localStorage.getItem("meower_savedpassword"), function() {
+                        $isLoggedIn = true
+                        status = ""
+                        console.log("CB")
+                        $goto("/")
+                    })
+                }
             })
+        } else {
+            if (
+                localStorage.getItem("meower_savedusername") &&
+                localStorage.getItem("meower_savedpassword")
+            ) {
+                doLogin(localStorage.getItem("meower_savedusername"), localStorage.getItem("meower_savedpassword"), function() {
+                    $isLoggedIn = true
+                    status = ""
+                    console.log("CB")
+                    $goto("/")
+                })
+            }
         }
     })
 </script>
