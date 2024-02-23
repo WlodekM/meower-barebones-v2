@@ -197,6 +197,7 @@
 		{#if $ulist.includes(post.u)}
 			<div class="online"></div>
 		{/if}
+		<span class="id">{post._id}</span>
 		<div id="spacer" style="width: 100%;"></div>
 		{#if input}
 			<button
@@ -228,10 +229,15 @@
 	{#await ($user.xss ? markdown : addFancyElements)(post.p) then content}
 		{@html content}
 	{/await}
-    <div class="post-images" id="{post["post_id"]}-images"></div>
 </div>
 
 <style>
+	.id {
+		color: #fff4;
+		text-wrap: nowrap;
+		min-width: fit-content;
+	}
+
 	:global(.post p) {
 		margin: 0;
 	}
@@ -242,7 +248,7 @@
     }
 
 	.online {
-		width: 10px;
+		min-width: 10px !important;
 		height: 10px;
 		margin-block: auto;
 		background: limegreen;

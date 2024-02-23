@@ -1,11 +1,29 @@
 <script>
-    import { user, chats, isLoggedIn, ulist } from "@/lib/stores.js";
+    import { user, chats, isLoggedIn, ulist, authHeader } from "@/lib/stores.js";
     import { goto, url } from "@roxi/routify";
+    import { apiUrl } from "@/lib/urls.js";
     import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
     import Topbar from "@/lib/Topbar.svelte"
     import Container from "@/lib/Container.svelte"
 	let sortedChats;
     if(!$isLoggedIn) {$goto("/login")}
+    async function loadPost(path) {
+        const params = new URLSearchParams({
+            autoget: "1",
+            page: (1).toString(),
+        }).toString();
+        console.log(`${apiUrl}${path}?${params}`)
+        const resp = await fetch(`${apiUrl}${path}?${params}`, {headers: $authHeader})
+        if (!resp.ok) {
+            throw new Error('Response code is not OK; code is ' + resp.status)
+        }
+        const json = await resp.json()
+        console.log(`!!`, json)
+
+
+        const result = json.autoget[0]
+        return result
+    }
 
     sortedChats = $chats
         .sort((a, b) => {
@@ -35,27 +53,37 @@
                         ...
                     {/if}
                     <br>
+                    {#await loadPost(`posts/${chat._id}`) then post}
+                        <i>
+                            {post.u}: {post.p}
+                        </i>
+                    {/await}
                 </Container>
             </a>
             <div style="margin-bottom: 8px;"></div>
         {:else if chat.type == 1}
             <a href={`/chats/${chat._id}`} style="text-decoration: none;">
                 <Container>
-                    <h1>
+                    <h1 style="margin: 0;">
                         {chat.members.filter(
                             username => username !== $user.name
-                        )[0]} <span style="color: gray;font-size: 0.5em;">({chat._id})</span>
+                        )[0]}
+                        {#if $ulist?.includes(chat.members.filter(
+                            username => username !== $user.name
+                        )[0])}
+                            <span style="color: lime;font-size: 0.5em;">Online</span>
+                        {:else}
+                            <span style="color: gray;font-size: 0.5em;">Offline</span>
+                        {/if} <span style="color: gray;font-size: 0.5em;">({chat._id})</span>
                     </h1>
-                    {#if $ulist?.includes(chat.members.filter(
-                        username => username !== $user.name
-                    )[0])}
-                        <span style="color: lime;">Online</span>
-                    {:else}
-                        <span style="color: gray;">Offline</span>
-                    {/if}
                     <!-- {chat.members.length > 10
                         ? chat.members.slice(0, 9).join(", ") + "..."
                         : chat.members.join(", ")} -->
+                    {#await loadPost(`posts/${chat._id}`) then post}
+                        <i>
+                            {post.u}: {post.p}
+                        </i>
+                    {/await}
                 </Container>
             </a>
             <div style="margin-bottom: 8px;"></div>

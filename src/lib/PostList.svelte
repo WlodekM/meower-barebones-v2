@@ -6,10 +6,12 @@
     import { authHeader, user, isGuest, isLoggedIn } from "./stores.js";
     import Container from "./Container.svelte"
 	import { emojify } from "@/lib/emojis.js";
+	import autosize from 'svelte-autosize';
 
     export let path = '/home'
     export let origin = "home"
     export let chat = "home"
+    // export let expandUserList = false
     export let enablePosting = true
 
     console.log(path)
@@ -110,9 +112,10 @@
         postInput.value = ""
     }
 </script>
+{#if enablePosting}
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
-    <textarea rows="2" class="type-message" bind:this={postInput}></textarea>
+    <textarea rows="2" class="type-message" bind:this={postInput} use:autosize></textarea>
     <button id="postbutton" on:click={()=>{
 		console.log("hi mom")
 		let post = postInput.value + " "
@@ -181,6 +184,7 @@
 		}
 	}}>Post!</button>
 </div>
+{/if}
 
 <div id="posts">
     {#key posts}

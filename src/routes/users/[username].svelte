@@ -1,13 +1,14 @@
 <script>
 	import { apiUrl, encodeApiURLParams } from "@/lib/urls.js";
 	import { params, goto } from "@roxi/routify";
-	import { authHeader } from "@/lib/stores.js";
+	import { authHeader, chats } from "@/lib/stores.js";
     import { ulist, user } from "@/lib/stores";
     import * as clm from "@/lib/clm.js";
     import Topbar from "@/lib/Topbar.svelte";
     import Container from "@/lib/Container.svelte";
     import hljs from "highlight.js";
 	import MarkdownIt from "markdown-it";
+	import autosize from 'svelte-autosize';
 
     const PFP_COUNT = 34;
 
@@ -142,7 +143,60 @@
     <div style="padding: 8px;">
         <Container>
             <h1 style="margin: 0;margin-bottom: 8px;">{$params.username}</h1>
-            {$ulist.includes($params.username) ? "Online" : "Offline"}
+			{#if $ulist.includes($params.username)}
+				Online
+			{:else}
+				Offline since {new Date(data.last_seen * 1000)}
+			{/if}
+			<br>
+			<button 
+			on:click={async () => {
+				let chat = $chats.find(
+					_chat =>
+						_chat.type === 1 &&
+						_chat.members.includes(data._id)
+				);
+				if (chat) {
+					$goto(`/chats/[chatid]`, {chatid: chat._id});
+				} else {
+					try {
+						const resp = await fetch(
+							`${apiUrl}users/${data._id}/dm`,
+							{
+								method: "GET",
+								headers: $authHeader,
+							}
+						);
+						if (!resp.ok) {
+							switch (resp.status) {
+								case 403:
+									return;
+								case 429:
+									throw new Error(
+										"Too many requests! Try again later."
+									);
+								default:
+									throw new Error(
+										"Response code is not OK; code is " +
+											resp.status
+									);
+							}
+						}
+						const chat = await resp.json();
+						if (
+							$chats.findIndex(
+								_chat => _chat._id === chat._id
+							) === -1
+						) {
+							$chats.push(chat);
+						}
+						$goto(`/chats/[chatid]`, {chatid: chat._id});
+					} catch (e) {
+						console.error(e)
+					}
+				}
+			}}>Message</button>
+			<button disabled>Block</button>
         </Container>
     </div>
     <div style="padding: 8px; padding-block: 0;">
@@ -185,7 +239,7 @@
 						layout: _layout,
 					})
 				}}>
-					<textarea name="mbb" bind:value={_layout.css} style="width: 100%;" /><br>
+					<textarea name="mbb" bind:value={_layout.css} style="width: 100%;" use:autosize /><br>
 					<input type="submit" value="Save">
 				</form>
             </Container>

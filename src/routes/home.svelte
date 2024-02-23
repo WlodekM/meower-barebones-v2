@@ -16,7 +16,7 @@
 		<h1 style="margin: 0;margin-bottom: 8px;">Home</h1>
 		There are {$ulist.length} users online
 		<br>
-        <details>
+        <details open>
             <summary style="cursor: pointer;">Members</summary>
             {#each $ulist as member}
                 <UsernameDisplay member={member} />{#if $ulist.indexOf(member) != $ulist.length -1},&nbsp;{/if}
