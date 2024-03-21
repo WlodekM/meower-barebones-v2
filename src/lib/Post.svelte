@@ -197,7 +197,7 @@
 		{#if $ulist.includes(post.u)}
 			<div class="online"></div>
 		{/if}
-		<span class="id">{post._id}</span>
+		<!-- <span class="id">{post._id}</span> -->
 		<div id="spacer" style="width: 100%;"></div>
 		{#if input}
 			<button
