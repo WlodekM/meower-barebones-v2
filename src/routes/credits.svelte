@@ -16,7 +16,7 @@
                 <a target="_blank" href="https://github.com/MDWalters">M. D. Walters</a> - 2 commits 💀
             </li>
             <li>
-                <a target="_blank" href="https://github.com/meower-media-co/Meower-Svelte/tree/develop#contributors">The Meower Svelte team</a> - I "borrowed" some code from them but showier says its fine as long as I credit 🤷‍♂️
+                <a target="_blank" href="https://github.com/meower-media-co">The Meower Svelte team</a> - I "borrowed" some code from them but showier says its fine as long as I credit 🤷‍♂️
             </li>
         </ul>
     </Container>
