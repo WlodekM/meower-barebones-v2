@@ -118,7 +118,7 @@
     <textarea rows="2" class="type-message" bind:this={postInput} use:autosize></textarea>
     <button id="postbutton" on:click={()=>{
 		console.log("hi mom")
-		let post = postInput.value + " "
+		let post = postInput.value
 		post = emojify(post)
 		//@ts-ignore
 		if (window.mixins) {
@@ -155,6 +155,7 @@
         //         postError = `Error when posting: "${err}"`
         //     })
         // }
+        post = post + " "
         postPost(post, origin)
         if (postError) {
             //@ts-ignore

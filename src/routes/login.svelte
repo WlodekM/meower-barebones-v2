@@ -103,6 +103,8 @@
         }
         if(isJsonString(json.layout)) {
             json.layout = JSON.parse(json.layout)
+        } else {
+            json.layout = {css: ""}
         }
         $user = json
         console.log($user)

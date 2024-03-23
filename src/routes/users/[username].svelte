@@ -38,12 +38,15 @@
         }
         const json = await resp.json();
 		if(json._id == $user.name) {
-			if(isJsonString(json.layout)) {
+			if(isJsonString(json.layout) && json.layout != "\"new\"" && json.layout != "\"old\"") {
 				json.layout = JSON.parse(json.layout)
 			} else {
+				console.log("uh yes")
 				clm.updateProfile({
 					layout: {css: ""}
 				})
+				$user.layout = {css: ""}
+				json.layout = {css: ""}
 			}
 		}
 		console.log(json)
@@ -235,6 +238,7 @@
 				<form 
 				on:submit={(e) => {
 					e.preventDefault()
+					console.log(_layout)
 					clm.updateProfile({
 						layout: _layout,
 					})

@@ -189,7 +189,7 @@
 		{#if post.bridged}
 			<badge>BRIDGED</badge>
 		{/if}
-        {#if post.p.endsWith(" ")}
+        {#if post.p.includes(" ")}
             <span class="badge">
                 Barebones
             </span>
