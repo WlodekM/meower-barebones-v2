@@ -48,17 +48,6 @@
                     status = `Uncaught  error!`
             }
         }
-        //@ts-ignore
-        if (window.mixins) {
-            //@ts-ignore
-            if (!window.mixins) window.mixins = []
-            //@ts-ignore
-            window.mixins.forEach(mixin => {
-                if(mixin.type == "onLogin") {
-                    mixin.function()
-                }
-            });
-        }
         let res = await fetch(`https://api.meower.org/users/${username}`,
         {
             headers: $authHeader,
@@ -105,6 +94,17 @@
             json.layout = {css: ""}
         }
         $user = json
+        //@ts-ignore
+        if (window.mixins) {
+            //@ts-ignore
+            if (!window.mixins) window.mixins = []
+            //@ts-ignore
+            window.mixins.forEach(mixin => {
+                if(mixin.type == "onLogin") {
+                    mixin.function()
+                }
+            });
+        }
         cb()
     }
     onMount(()=>{

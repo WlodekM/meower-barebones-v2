@@ -44,6 +44,7 @@
         text = text.replaceAll("<", "&lt;")
         text = text.replaceAll("&", "&gt;")
         text = text.replaceAll("\n", "<br>")
+        text = text.replaceAll(" ", "&nbsp;")
         return text
     }
 </script>
@@ -51,6 +52,7 @@
 <Topbar />
 
 <h1>Debug info</h1>
+<div class="pluginControl">
 <input accept=".js,.mjs,.plugin.js,.mbb.js,.barebones.js" bind:files id="avatar" name="avatar" type="file" />
 <br>
 <button on:click={async ()=>{
@@ -58,28 +60,32 @@
         let plugin = await files[0].text()
         eval(plugin)
         if(localStorage.getItem("plugin")) {
-            localStorage.setItem("plugin", Base64._utf8_encode(Base64._utf8_decode(localStorage.getItem("plugin")) + ";\n" + (plugin)))
+            localStorage.setItem("plugin", Base64._utf8_encode(Base64._utf8_decode(localStorage.getItem("plugin")) + ";/*MBB-PLUGIN*/\n" + (plugin)))
         } else {
             localStorage.setItem("plugin", Base64._utf8_encode(plugin))
         }
     }
 }}>Load plugin</button>
-{#key localStorage}
+{#key localStorage.getItem("plugin")}
     {#if localStorage.getItem("plugin")}
         <button on:click={
             ()=>{localStorage.removeItem("plugin")}
         }>Unload plugin(s)</button>
         <br>
         <details>
-            <summary>Plugin code</summary>
-            <div class="code">
-                <code>
-                    {@html addFancyElements(Base64._utf8_decode(localStorage.getItem("plugin")))}
-                </code>
-            </div>
+            <summary>Plugins</summary>
+            {#each Base64._utf8_decode(localStorage.getItem("plugin")).split(";/*MBB-PLUGIN*/\n") as plugin}
+                <div class="code">
+                    <code>
+                        {@html addFancyElements(plugin)}
+                    </code>
+                </div>
+                <br>
+            {/each}
         </details>
     {/if}
 {/key}
+</div>
 <h2>Mixins</h2>
 {#each debug.mixins as mixin}
     <h4>{mixin.type}</h4>
