@@ -7,25 +7,11 @@
     --accent: #00aaff;
 }
 
-/* button, input[type="text"], input[type="search"], input[type="password"], input[type="datetime-local"], textarea, select {
-	border: solid 2px var(--foreground-orange);
-	border-radius: 5px;
-	outline: none;
-	background-color: var(--orange);
-	color: var(--foreground-orange);
-	padding: .5em 1em;
-	box-sizing: border-box;
-	margin-bottom: -.15rem;
-	margin-top: 0;
-	font-family: inherit;
-	font-size: inherit;
-} */
-
 body {
     background: var(--background);
     margin: 0;
     min-height: 100vh;
-    font-family: "Arial"
+    font-family: "Montserrat"
 }
 
 * {
@@ -33,7 +19,7 @@ body {
 }
 
 input, button, textarea {
-    font-family: 'Comic Sans', 'Comic Sans MS';
+    font-family: "Montserrat"
 }
 
 .posting {
