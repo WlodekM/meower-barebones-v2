@@ -5,32 +5,6 @@
 
     let currentPath = window.location.pathname;
     let updater = {}
-
-    // function waitPathChange() {
-    //     return new Promise(resolve => {
-    //         const onPathChange = () => {
-    //             resolve();
-    //             window.removeEventListener('popstate', onPathChange);
-    //         };
-    //         window.addEventListener('popstate', onPathChange);
-    //     });
-    // }
-
-    // onMount(() => {
-    //     window.onpopstate = async () => {
-    //         // jank
-    //         await tick()
-    //         await waitPathChange();
-    //         currentPath = window.location.pathname;
-    //         updater = {}
-    //     };
-    // });
-
-    // function isActive(path) {
-    //     // delay(10).then()
-    //     console.log(currentPath, path, currentPath.startsWith(path))
-    //     return currentPath.startsWith(path)
-    // }
 </script>
 {#key updater}
     <div class="top">

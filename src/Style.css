@@ -64,6 +64,12 @@ input, button, textarea {
     border:        2px var(--border) solid;
 }
 
+.code {
+    border-radius: 5px;
+    background:    var(--background);
+    padding:       5px;
+}
+
 .form-section {
     display: flex;
     justify-content: space-between;

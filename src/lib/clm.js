@@ -45,26 +45,14 @@ let _user = {
 };
 chats.subscribe(v => {
 	_chats = v;
-	// if (_authHeader.username && _authHeader.token) {
-	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
-	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
-	// }
 });
 
 authHeader.subscribe(v => {
 	_authHeader = v;
-	// if (_authHeader.username && _authHeader.token) {
-	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
-	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
-	// }
 });
 
 user.subscribe(v => {
 	_user = v;
-	// if (_authHeader.username && _authHeader.token) {
-	// 	localStorage.setItem("meower_savedusername", _authHeader.username);
-	// 	localStorage.setItem("meower_savedpassword", _authHeader.token);
-	// }
 });
 
 //NOTE - No, I didn't steal this from Meower Svelte, what are you talking about? (4)
@@ -76,12 +64,10 @@ user.subscribe(v => {
  */
 export async function meowerRequest(data) {
 	link.log("manager", "meower request", data);
-	// spinner.set(true);
 	return new Promise((resolve, reject) => {
 		let returnData = null;
 		const timer = setTimeout(() => {
 			reject("Timed out");
-			// spinner.set(false);
 		}, 10000);
 		const ev = link.sendListener(
 			{
@@ -91,7 +77,6 @@ export async function meowerRequest(data) {
 			cmd => {
 				if (cmd.cmd === "statuscode") {
 					link.off(ev);
-					// spinner.set(false);
 
 					clearTimeout(timer);
 
@@ -122,16 +107,11 @@ export function connect() {
     }
     link.connect(linkUrl)
     events.connected = link.on("connected", () => {
-        // disconnected.set(false);
-        // attemptedAutoReconnect.set(false);
         connected = true
         setInterval(() => {
             link.send({cmd: "ping", val: ""});
         }, 10000);
     });
-	// events.connectionstart = link.once("connectionstart", () => {
-    //     //...
-    // });
     events.ulist = link.on("ulist", cmd => {
         const _ulist = cmd.val.split(";");
         if (_ulist[_ulist.length - 1] === "") {
@@ -164,7 +144,6 @@ export function connect() {
     });
     events.auth = link.on("direct", async cmd => {
         if (cmd.val.mode === "auth") {
-            // set user, auth header, and relationships
             user.update(v =>
                 Object.assign(v, {
                     ...cmd.val.payload.account,
@@ -175,11 +154,6 @@ export function connect() {
                 username: cmd.val.payload.username,
                 token: cmd.val.payload.token,
             });
-            // _relationships = {};
-            // for (let relationship of cmd.val.payload.relationships) {
-            //     _relationships[relationship.username] = relationship.state;
-            // }
-            // relationships.set(_relationships);
     
             // get and set chats
             await tick();
@@ -237,17 +211,6 @@ export async function updateProfile(updatedValues) {
 		},
 	});
 }
-
-// cl.onmessage = (event) => {
-// 	console.log(event.data);
-//     if(JSON.parse(event.data).val == "I:112 | Trusted Access enabled") {
-//         sendDirect("meower")
-//         console.log("meower")
-//     }
-//     if (isWaitingForStatus && JSON.parse(event.data).cmd == "statuscode") {
-//         status = JSON.parse(event.data).val
-//     }
-// };
 
 export function sendCmd(cmd, val) {
     if(!connected) connect()

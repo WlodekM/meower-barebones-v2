@@ -1,6 +1,7 @@
 <script>
 	import { isLoggedIn } from '@/lib/stores.js'
     import Topbar from "@/lib/Topbar.svelte";
+    import { Base64 } from '@/lib/b64';
 	//@ts-ignore
     import { goto } from "@roxi/routify"
     if(!$isLoggedIn) {$goto("/login")}
@@ -38,6 +39,13 @@
         debug.mixins.push(mixin)
     });
 	let files;
+
+    function addFancyElements(text) {
+        text = text.replaceAll("<", "&lt;")
+        text = text.replaceAll("&", "&gt;")
+        text = text.replaceAll("\n", "<br>")
+        return text
+    }
 </script>
 
 <Topbar />
@@ -47,9 +55,31 @@
 <br>
 <button on:click={async ()=>{
     if(files) {
-        eval(await files[0].text())
+        let plugin = await files[0].text()
+        eval(plugin)
+        if(localStorage.getItem("plugin")) {
+            localStorage.setItem("plugin", Base64._utf8_encode(Base64._utf8_decode(localStorage.getItem("plugin")) + ";\n" + (plugin)))
+        } else {
+            localStorage.setItem("plugin", Base64._utf8_encode(plugin))
+        }
     }
 }}>Load plugin</button>
+{#key localStorage}
+    {#if localStorage.getItem("plugin")}
+        <button on:click={
+            ()=>{localStorage.removeItem("plugin")}
+        }>Unload plugin(s)</button>
+        <br>
+        <details>
+            <summary>Plugin code</summary>
+            <div class="code">
+                <code>
+                    {@html addFancyElements(Base64._utf8_decode(localStorage.getItem("plugin")))}
+                </code>
+            </div>
+        </details>
+    {/if}
+{/key}
 <h2>Mixins</h2>
 {#each debug.mixins as mixin}
     <h4>{mixin.type}</h4>

@@ -96,8 +96,7 @@
 
 			// Caht gtp
 			content = content.replace(regexPattern, '![image.png]($2)');
-
-			// console.log(content)
+			
 			const tokens = md.parse(
 				content
 					.replaceAll(/\[([^\]]+?): (https:\/\/[^\]]+?)\]/gs, `![IMAGE]()`)
