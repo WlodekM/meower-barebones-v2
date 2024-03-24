@@ -88,11 +88,9 @@
             whitelist_enabled: true,
             layout: {css: ""}
         }
-        console.log("asfinuan")
         if(!json.name && json._id) {
             json.name = json._id
         }
-        console.log("asfinuan 2")
         function isJsonString(str) {
             try {
                 JSON.parse(str);
@@ -107,7 +105,6 @@
             json.layout = {css: ""}
         }
         $user = json
-        console.log($user)
         cb()
     }
     onMount(()=>{
@@ -120,7 +117,6 @@
                     doLogin(localStorage.getItem("meower_savedusername"), localStorage.getItem("meower_savedpassword"), function() {
                         $isLoggedIn = true
                         status = ""
-                        console.log("CB")
                         $goto("/")
                     })
                 }
@@ -133,7 +129,6 @@
                 doLogin(localStorage.getItem("meower_savedusername"), localStorage.getItem("meower_savedpassword"), function() {
                     $isLoggedIn = true
                     status = ""
-                    console.log("CB")
                     $goto("/")
                 })
             }

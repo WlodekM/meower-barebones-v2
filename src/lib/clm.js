@@ -109,14 +109,12 @@ export async function meowerRequest(data) {
 }
 
 export function connect() {
-    console.log(events)
     if(events) {
         for (const ev in events) {
             if (Object.hasOwnProperty.call(events, ev)) {
                 const evID = events[ev];
                 if(evID) {
                     delete events[ev]
-                    console.log(`link.off("${evID}") // ${ev}`)
                     link.off(evID)
                 }
             }
@@ -135,7 +133,6 @@ export function connect() {
     //     //...
     // });
     events.ulist = link.on("ulist", cmd => {
-        console.log("ulist", cmd.val)
         const _ulist = cmd.val.split(";");
         if (_ulist[_ulist.length - 1] === "") {
             _ulist.pop();
@@ -254,13 +251,6 @@ export async function updateProfile(updatedValues) {
 
 export function sendCmd(cmd, val) {
     if(!connected) connect()
-    console.log({
-        "cmd": "direct",
-        "val": {
-            cmd: cmd,
-            val: val,
-        }
-    })
     return meowerRequest({
         "cmd": "direct",
         "val": {

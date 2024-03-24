@@ -14,8 +14,6 @@
     // export let expandUserList = false
     export let enablePosting = true
 
-    console.log(path)
-
     let id = 0;
 
     let queryParams = {}
@@ -33,14 +31,11 @@
             page: page.toString(),
             ...queryParams,
         }).toString();
-        console.log(`${apiUrl}${path}?${params}`)
         const resp = await fetch(`${apiUrl}${path}?${params}`, {headers: $authHeader})
         if (!resp.ok) {
             throw new Error('Response code is not OK; code is ' + resp.status)
         }
         const json = await resp.json()
-        console.log(`!!`, json)
-
 
         const result = json.autoget
         return result
@@ -55,19 +50,15 @@
     (async () => {
         //@ts-ignore
         posts = (await loadPosts())
-        console.log(posts)
     })()
 
     let destroy = () => {}
 
     if(destroy) destroy()
     onMount(()=>{
-        console.log("mounted")
         const eventID = clm.link.on("direct", (cmd) => {
-            console.log("cmd", cmd)
             if (!cmd.val) return;
             if (cmd.val["post_origin"] == origin) {
-                console.log("New post!!1!11111!1!!!1!1!!1!!!1!1!1")
                 let temp = posts
                 temp.unshift(cmd.val)
                 posts = temp
@@ -78,7 +69,6 @@
             }
         })
         destroy = ()=>{
-            console.log("destroyed")
             clm.link.off(eventID)
         }
     })
@@ -117,7 +107,6 @@
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
     <textarea rows="2" class="type-message" bind:this={postInput} use:autosize></textarea>
     <button id="postbutton" on:click={()=>{
-		console.log("hi mom")
 		let post = postInput.value
 		post = emojify(post)
 		//@ts-ignore

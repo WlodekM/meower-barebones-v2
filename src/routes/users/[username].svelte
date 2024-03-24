@@ -41,7 +41,6 @@
 			if(isJsonString(json.layout) && json.layout != "\"new\"" && json.layout != "\"old\"") {
 				json.layout = JSON.parse(json.layout)
 			} else {
-				console.log("uh yes")
 				clm.updateProfile({
 					layout: {css: ""}
 				})
@@ -49,10 +48,8 @@
 				json.layout = {css: ""}
 			}
 		}
-		console.log(json)
 		profileThemeMatch = json.quote.match(/:mbb\{"border":"#[0-9a-fA-F]{6}","background":"#[0-9a-fA-F]{6}","sec-background":"#[0-9a-fA-F]{6}"\}$/g)
 		if(profileThemeMatch) {
-			console.log(profileThemeMatch[0], String(profileThemeMatch[0]))
 			json.quote = json.quote.replaceAll(profileThemeMatch[0], "")
 			profileTheme = JSON.parse((profileThemeMatch)[0].replace(":mbb", ""))
 		}
@@ -103,7 +100,6 @@
 								true
 							) {
 								childToken.attrs[srcPos][1] = "about:blank";
-								console.log(childToken);
 							}
 						}
 						if (childToken.type === "link_open") {
@@ -238,7 +234,6 @@
 				<form 
 				on:submit={(e) => {
 					e.preventDefault()
-					console.log(_layout)
 					clm.updateProfile({
 						layout: _layout,
 					})

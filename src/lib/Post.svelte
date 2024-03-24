@@ -35,7 +35,6 @@
 							const srcPos = childToken.attrs.findIndex(attr => attr[0] === "src");
 							if (true) {
 								childToken.attrs[srcPos][1] = "about:blank";
-								console.log(childToken);
 							}
 						}
 						if (childToken.type === "link_open") {
@@ -119,7 +118,6 @@
 							) {
 								childToken.attrs[srcPos][1] = "about:blank";
 								childToken.children[0].content = `[Image blocked]`;
-								console.log(childToken);
 							}
 						}
 						if (childToken.type === "link_open") {
@@ -207,7 +205,6 @@
 					const mentionRegex =
 						/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
 					const mention = `@${post.u} [${post.post_id}] `;
-					console.log(post, post.u)
 
 					if (mentionRegex.test(existingText)) {
 						input.value = existingText

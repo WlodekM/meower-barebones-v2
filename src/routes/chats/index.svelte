@@ -12,14 +12,11 @@
             autoget: "1",
             page: (1).toString(),
         }).toString();
-        console.log(`${apiUrl}${path}?${params}`)
         const resp = await fetch(`${apiUrl}${path}?${params}`, {headers: $authHeader})
         if (!resp.ok) {
             throw new Error('Response code is not OK; code is ' + resp.status)
         }
         const json = await resp.json()
-        console.log(`!!`, json)
-
 
         const result = json.autoget[0]
         return result
