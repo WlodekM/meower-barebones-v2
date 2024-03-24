@@ -51,7 +51,7 @@
         //@ts-ignore
         if (window.mixins) {
             //@ts-ignore
-            if (typeof window.mixins != "array") window.mixins = []
+            if (!window.mixins) window.mixins = []
             //@ts-ignore
             window.mixins.forEach(mixin => {
                 if(mixin.type == "onLogin") {

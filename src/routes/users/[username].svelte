@@ -131,6 +131,7 @@
 		return renderedContent;
 	}
 	let _layout = $user.layout
+	let _debug = $user.debug
 </script>
 
 <div style={profileTheme ? `background: ${profileTheme.background}; min-height: 100VH` : ""}>
@@ -228,6 +229,15 @@
                         })}}
                 /><br>
                 XSS is currently {($user.xss ?? false) ? "enabled" : "disabled"}
+				<br />
+                Enable debug mode: <input type="checkbox" name="XSS" checked={_debug} 
+                    on:click={() =>{
+						_debug = _debug === true ? false : true;
+                        clm.updateProfile({
+                            debug: _debug
+                        })}}
+                /><br>
+                debug mode is currently {($user.debug ?? false) ? "enabled" : "disabled"}
 				<br>
                 CSS theme: 
 				<br>

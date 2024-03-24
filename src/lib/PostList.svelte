@@ -112,11 +112,11 @@
 		//@ts-ignore
 		if (window.mixins) {
 			//@ts-ignore
-			if (typeof window.mixins != "array") window.mixins = []
+			if (!window.mixins) window.mixins = []
 			//@ts-ignore
 			window.mixins.forEach(mixin => {
 				if(mixin.type == "prePost") {
-					post = mixin.function()
+					post = mixin.function(post)
 				}
 			});
 		}
@@ -150,7 +150,7 @@
             //@ts-ignore
             if (window.mixins) {
                 //@ts-ignore
-                if (typeof window.mixins != "array") window.mixins = []
+                if (!window.mixins) window.mixins = []
                 //@ts-ignore
                 window.mixins.forEach(mixin => {
                     if(mixin.type == "onPostError") {
@@ -164,7 +164,7 @@
 		//@ts-ignore
 		if (window.mixins) {
 			//@ts-ignore
-			if (typeof window.mixins != "array") window.mixins = []
+			if (!window.mixins) window.mixins = []
 			//@ts-ignore
 			window.mixins.forEach(mixin => {
 				if(mixin.type == "onPosted") {

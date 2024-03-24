@@ -23,7 +23,7 @@
 		//@ts-ignore
 		if (window.mixins) {
 			//@ts-ignore
-			if (typeof window.mixins != "array") window.mixins = []
+			if (!window.mixins) window.mixins = []
 			//@ts-ignore
 			window.mixins.forEach(mixin => {
 				if(mixin.type == "onPosted") {
@@ -32,16 +32,32 @@
 			});
 		}
     //@ts-ignore
-    if (typeof window.mixins != "array") window.mixins = []
+    if (!window.mixins) window.mixins = []
     //@ts-ignore
     window.mixins.forEach(mixin => {
         debug.mixins.push(mixin)
     });
+	let files;
 </script>
 
 <Topbar />
 
 <h1>Debug info</h1>
+<input accept=".js,.mjs,.plugin.js,.mbb.js,.barebones.js" bind:files id="avatar" name="avatar" type="file" />
+<br>
+<button on:click={async ()=>{
+    if(files) {
+        eval(await files[0].text())
+    }
+}}>Load plugin</button>
+<h2>Mixins</h2>
+{#each debug.mixins as mixin}
+    <h4>{mixin.type}</h4>
+    {mixin.function?.toString() ?? "Null"}
+{/each}
+{#if debug.mixins.length <= 0}
+    No mixins found, either your plugins r brokey or you dont use plugins (IMPOSSIBUL!11!11!?!???//)
+{/if}
 <h2>Stores</h2>
 {#each debug.stores as store}
     <h4>{store.key}</h4>
@@ -58,11 +74,3 @@
         //@ts-ignore
         window.stores[store.key] = parsedValue}}>{JSON.stringify(store.value) ?? "Null"}</textarea>
 {/each}
-<h2>Mixins</h2>
-{#each debug.mixins as mixin}
-    <h4>{mixin.type}</h4>
-    {mixin.function?.toString() ?? "Null"}
-{/each}
-{#if !debug.mixins}
-    No mixins found, either your plugins r brokey or you dont use plugins (IMPOSSIBUL!11!11!?!???//)
-{/if}
