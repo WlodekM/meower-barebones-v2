@@ -164,7 +164,7 @@
             </div>
             <div class="form-section">
                 <span>
-                    Password <i>(optional)</i>:
+                    Password:
                 </span>
                 <input { type } name="password" id="password" on:input={(event)=>{
                     //@ts-ignore
