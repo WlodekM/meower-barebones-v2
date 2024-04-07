@@ -4,6 +4,7 @@
 	import { authHeader, chats } from "@/lib/stores.js";
     import { ulist, user } from "@/lib/stores";
     import * as clm from "@/lib/clm.js";
+	import PostList from '@/lib/PostList.svelte';
     import Topbar from "@/lib/Topbar.svelte";
     import Container from "@/lib/Container.svelte";
     import hljs from "highlight.js";
@@ -253,6 +254,8 @@
 				</form>
             </Container>
         </div>
+	{:else}
+		<PostList path={`users/${$params.username}/posts`} enablePosting={false} update={false} />
     {/if}
 {/await}
 </div>

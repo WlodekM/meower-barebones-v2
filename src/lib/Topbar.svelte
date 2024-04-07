@@ -8,7 +8,7 @@
 </script>
 {#key updater}
     <div class="top">
-        <h1 id="logo" on:click={()=>{$goto("/home")}}>Meower Barebones</h1>
+        <h1 id="logo" on:click={()=>{$goto("/home")}}>Barebones</h1>
         <div class="links">
             {#if $isLoggedIn}
                 <button class:active={$isActive("/home")}    on:click={()=>{$goto("/home")}}    disabled={!$isLoggedIn}>Home</button>

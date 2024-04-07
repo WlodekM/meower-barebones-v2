@@ -11,6 +11,7 @@
     export let path = '/home'
     export let origin = "home"
     export let chat = "home"
+    export let update = true
     // export let expandUserList = false
     export let enablePosting = true
 
@@ -52,27 +53,31 @@
         posts = (await loadPosts())
     })()
 
-    let destroy = () => {}
 
-    if(destroy) destroy()
-    onMount(()=>{
-        const eventID = clm.link.on("direct", (cmd) => {
-            if (!cmd.val) return;
-            if (cmd.val["post_origin"] == origin) {
-                let temp = posts
-                temp.unshift(cmd.val)
-                posts = temp
-            } else if (cmd.val["post_origin"]) console.log(cmd.val["post_origin"])
-            if (cmd.val.mode == "delete") {
-                let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
-                if (posts[postID]) deleteFromArray(posts, postID)
+    if(update) {
+        let destroy = () => {}
+
+        if(destroy) destroy()
+        onMount(()=>{
+            const eventID = clm.link.on("direct", (cmd) => {
+                if (!cmd.val) return;
+                if (cmd.val["post_origin"] == origin) {
+                    let temp = posts
+                    temp.unshift(cmd.val)
+                    posts = temp
+                } else if (cmd.val["post_origin"]) console.log(cmd.val["post_origin"])
+                if (cmd.val.mode == "delete") {
+                    let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
+                    if (posts[postID]) deleteFromArray(posts, postID)
+                }
+            })
+            destroy = ()=>{
+                clm.link.off(eventID)
             }
         })
-        destroy = ()=>{
-            clm.link.off(eventID)
-        }
-    })
-    onDestroy(destroy)
+        onDestroy(destroy)
+    }
+    
 	function postsMapThing(post) {
 		const badges = {
 			"Discord": "Bridged",

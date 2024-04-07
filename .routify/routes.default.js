@@ -169,6 +169,20 @@ export default {
     },
     {
       "meta": {},
+      "id": "_default_token_svelte",
+      "name": "token",
+      "file": {
+        "path": "src/routes/token.svelte",
+        "dir": "src/routes",
+        "base": "token.svelte",
+        "ext": ".svelte",
+        "name": "token"
+      },
+      "asyncModule": () => import('../src/routes/token.svelte'),
+      "children": []
+    },
+    {
+      "meta": {},
       "id": "_default_users",
       "name": "users",
       "module": false,

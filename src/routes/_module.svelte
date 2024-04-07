@@ -13,10 +13,13 @@
         "/",
         "/logout",
         "/logout/",
-        "/chats"
+        "/chats",
     ]
-    if(!$isLoggedIn && requiredLoginPaths.some((a)=>window.location?.pathname.startsWith(a))) {
-        $goto("/login")
+    if((!$isLoggedIn && requiredLoginPaths.some((a)=>window.location?.pathname.startsWith(a))) && !window.location?.pathname.startsWith("/token")) {
+        console.log(`/login?redirect=${window.location?.pathname}`)
+        $goto($url(`/login`, {
+            redirect: window.location?.pathname
+        }))
     }
     function waitForElm(selector) {
         return new Promise(resolve => {
