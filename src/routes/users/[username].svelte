@@ -255,6 +255,12 @@
             </Container>
         </div>
 	{:else}
+		<div style="margin:8px">
+			<hr>
+			<Container>
+				<h1>Recent posts</h1>
+			</Container>
+		</div>
 		<PostList path={`users/${$params.username}/posts`} enablePosting={false} update={false} />
     {/if}
 {/await}
