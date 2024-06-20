@@ -1,6 +1,7 @@
 <script>
     import { goto } from "@roxi/routify"
     import { isLoggedIn, isGuest, user, authHeader, chats } from "@/lib/stores.js"
+    import { linkUrl, apiUrl } from "@/lib/urls.js";
     let username, token
     let status = ""
     let passwordShown = false
@@ -13,7 +14,7 @@
             username: username,
             token: token
         }
-        let res = await fetch(`https://api.meower.org/users/${username}`,
+        let res = await fetch(`${apiUrl}/users/${username}`,
         {
             headers: $authHeader,
         })
@@ -60,7 +61,7 @@
         }
         $user = json
     
-        const resp = await fetch(`https://api.meower.org/chats?autoget=1`, {
+        const resp = await fetch(`${apiUrl}/chats?autoget=1`, {
             headers: $authHeader,
         });
         const json2 = await resp.json();

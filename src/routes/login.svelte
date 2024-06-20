@@ -1,6 +1,6 @@
 <script>
     import { sendCmd, link, connected, meowerRequest } from "@/lib/clm"
-    import { linkUrl } from "@/lib/urls.js";
+    import { linkUrl, apiUrl } from "@/lib/urls.js";
     import { goto } from "@roxi/routify"
     import { isLoggedIn, isGuest, user, authHeader } from "@/lib/stores.js"
     import { onMount } from "svelte"
@@ -48,7 +48,7 @@
                     status = `Uncaught  error!`
             }
         }
-        let res = await fetch(`https://api.meower.org/users/${username}`,
+        let res = await fetch(`${apiUrl}/users/${username}`,
         {
             headers: $authHeader,
         })
