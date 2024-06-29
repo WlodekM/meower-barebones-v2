@@ -21,16 +21,16 @@ export default {
         "order": false,
         "dynamicSpread": true
       },
-      "id": "_default_____404__svelte",
-      "name": "[...404]",
+      "id": "_default_____fallback__svelte",
+      "name": "[...fallback]",
       "file": {
-        "path": "src/routes/[...404].svelte",
+        "path": "src/routes/[...fallback].svelte",
         "dir": "src/routes",
-        "base": "[...404].svelte",
+        "base": "[...fallback].svelte",
         "ext": ".svelte",
-        "name": "[...404]"
+        "name": "[...fallback]"
       },
-      "asyncModule": () => import('../src/routes/[...404].svelte'),
+      "asyncModule": () => import('../src/routes/[...fallback].svelte'),
       "children": []
     },
     {
