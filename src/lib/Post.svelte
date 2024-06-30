@@ -2,6 +2,8 @@
     // import marked from "marked";
 	import MarkdownIt from "markdown-it";
     import hljs from "highlight.js";
+	import PFP from './PFP.svelte'
+	import loadProfile from "./loadProfile.js";
     import Container from "@/lib/Container.svelte";
 	import FormattedDate from "./FormattedDate.svelte";
 	import { IMAGE_HOST_WHITELIST } from "./whitelist";
@@ -9,6 +11,13 @@
     import { ulist, user } from "./stores"
     export let post;
     export let input;
+	
+	$: noPFP =
+		post.user === "Notification" ||
+		post.user.startsWith("Notification to ") ||
+		post.user === "Announcement" ||
+		post.user === "Server" ||
+		post.user === "Webhooks";
 
     // yoink
 	function markdown(input) {
@@ -178,56 +187,124 @@
 
 		return renderedContent;
 	}
-
 </script>
 <div class="post container">
-    <div class="post-header" style="width: 100%;">
-        <UsernameDisplay member={post.u} showOnline={false} />
-		{#if post.bridged}
-			<badge>BRIDGED</badge>
-		{/if}
-        {#if post.p.includes(" ")}
-            <span class="badge">
-                Barebones
-            </span>
-        {/if}
-		{#if $ulist.includes(post.u)}
-			<div class="online"></div>
-		{/if}
-		<!-- <span class="id">{post._id}</span> -->
-		<div id="spacer" style="width: 100%;"></div>
-		{#if input}
-			<button
-				on:click={() => {
-					let existingText = input.value;
-
-					const mentionRegex =
-						/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
-					const mention = `@${post.u} [${post.post_id}] `;
-
-					if (mentionRegex.test(existingText)) {
-						input.value = existingText
-							.trim()
-							.replace(mentionRegex, mention);
-					} else {
-						input.value = mention + existingText.trim();
-					}
-
-					input.focus();
-				}}
-			>reply</button>
-		{/if}
-    </div>
-	<div class="post-time">
-		<FormattedDate date={post.t.e} />
+	<div class="flex-row">
+		<div class="post-pfp">
+			{#await noPFP ? Promise.resolve(true) : loadProfile(post.user)}
+				<PFP
+					icon={-2}
+					alt="{post.user}'s profile picture"
+				/>
+			{:then profile}
+				{(()=>{console.debug(post.user.avatar,post.user);return ""})()}
+				<PFP
+					icon={noPFP
+						? post.user === "Server"
+							? 102
+							: post.post_origin === "inbox" &&
+							  (post.user === "Announcement" ||
+									post.user === "Notification" ||
+									post.user.startsWith("Notification to"))
+							? 101
+							: -2
+						: profile.pfp_data}
+					avatar={profile.avatar}
+					alt="{post.user}'s profile picture"
+				/>
+			{:catch}
+				<PFP
+					icon={-2}
+					alt="{post.user}'s profile picture"
+				/>
+			{/await}
+		</div>
+		<div class="post-content">
+			<div class="post-header" style="width: 100%;">
+				<div>
+					<UsernameDisplay member={post.user} showOnline={false} />
+					{#if post.bridged}
+						<badge>BRIDGED</badge>
+					{/if}
+					{#if post.content.includes(" ")}
+						<span class="badge">
+							Barebones
+						</span>
+					{/if}
+					{#if $ulist.includes(post.user)}
+						<div class="online"></div>
+					{/if}
+				</div>
+				<!-- <span class="id">{post._id}</span> -->
+				<div>
+					{#if input}
+						<button
+							on:click={() => {
+								let existingText = input.value;
+			
+								const mentionRegex =
+									/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i;
+								const mention = `@${post.user} [${post.post_id}] `;
+			
+								if (mentionRegex.test(existingText)) {
+									input.value = existingText
+										.trim()
+										.replace(mentionRegex, mention);
+								} else {
+									input.value = mention + existingText.trim();
+								}
+			
+								input.focus();
+							}}
+						>reply</button>
+					{/if}
+					{#if $user.debug}
+						<button
+							on:click={() => {
+								console.info("!", post)
+							}}
+						>Post Data</button>
+					{/if}
+				</div>
+			</div>
+			<div class="post-time">
+				<FormattedDate date={post.date} />
+			</div>
+			<!-- {@html marked(post.p)} -->
+			{#await ($user.xss ? markdown : addFancyElements)(post.content) then content}
+				{@html content}
+			{/await}
+			{#if post.attachments}
+				{#each post.attachments as attachment}
+					<a href={`https://uploads.meower.org/attachments/${attachment.id}/${attachment.filename}`} target="_blank" rel="noopener noreferrer">
+						<img title={attachment.filename} alt={attachment.filename} src={`https://uploads.meower.org/attachments/${attachment.id}/${attachment.filename}?preview`}>
+					</a>
+				{/each}
+			{/if}
+		</div>
 	</div>
-	<!-- {@html marked(post.p)} -->
-	{#await ($user.xss ? markdown : addFancyElements)(post.p) then content}
-		{@html content}
-	{/await}
 </div>
 
 <style>
+	.post-header div {
+		display: inline-block;
+	}
+
+	.post-header {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.post-content {
+		flex-grow: 1;
+	}
+
+	.flex-row {
+		display: flex;
+		gap: 1em;
+		flex-direction: row;
+	}
+
 	.id {
 		color: #fff4;
 		text-wrap: nowrap;
@@ -246,6 +323,7 @@
 	.online {
 		min-width: 10px !important;
 		height: 10px;
+		width: 10px;
 		margin-block: auto;
 		background: limegreen;
 		border-radius: 100%;

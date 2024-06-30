@@ -43,6 +43,58 @@
         return result
     }
 
+    function processPost(post) {
+        if ("lower_username" in post) {
+            // @ts-ignore
+            const user = {
+                id: id++,
+                ...post,
+            };
+            return user;
+        }
+        if (post.post_origin === "inbox") {
+            if (post.u === "Server") {
+                post.u = "Announcement";
+            } else {
+                post.u =
+                    path === "inbox"
+                        ? "Notification"
+                        : `Notification to ${post.u}`;
+            }
+        }
+        return {
+            id: id++,
+            post_id: post._id,
+            post_origin: post.post_origin,
+            attachments: post.attachments,
+            user: post.u,
+            content: post.p,
+            unfiltered_content: post.unfiltered_p,
+            bridged: post.bridged,
+            date: post.t.e,
+            edited_at: post.edited_at,
+            isDeleted: post.isDeleted,
+            mod_deleted: post.mod_deleted,
+            deleted_at: post.deleted_at,
+        };
+		// if ($user.hide_blocked_users) {
+		// 	// @ts-ignore
+		// 	result = result.filter(
+		// 		post =>
+		// 			$relationships[post._id] !== 2 &&
+		// 			$relationships[post.u] !== 2
+		// 	);
+		// }
+		// const numPages = json["pages"];
+
+		// if (firstLoad) dispatch("loaded");
+		// firstLoad = false;
+		// return {
+		// 	numPages,
+		// 	result,
+		// };
+    }
+
 	function deleteFromArray(array, index) {
 		array.splice(index, 1)
 	}
@@ -66,10 +118,10 @@
                     let temp = posts
                     temp.unshift(cmd.val)
                     posts = temp
-                } else if (cmd.val["post_origin"]) console.log(cmd.val["post_origin"])
-                if (cmd.val.mode == "delete") {
-                    let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
-                    if (posts[postID]) deleteFromArray(posts, postID)
+                    if (cmd.val.mode == "delete") {
+                        let postID = posts.findIndex((a)=>{a["_id"] == cmd.val.id})
+                        if (posts[postID]) deleteFromArray(posts, postID)
+                    }
                 }
             })
             destroy = ()=>{
@@ -93,7 +145,7 @@
 			thePost.bridged = true
             thePost.p = thePost.p.split(":").slice(1).join(":")
         }
-		return thePost
+		return processPost(thePost)
 	}
 
     function postPost(content, postOrigin) {
