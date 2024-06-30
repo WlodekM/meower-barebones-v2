@@ -149,7 +149,8 @@
             if (!$isGuest) {
                 doLogin(username, password, function() {
                     status = ""
-                    $goto("/")
+                    let query = new URLSearchParams(window.location.search);
+                    $goto(query.has("redirect") ? query.get("redirect") : "/")
                 })
             } else {
                 status = "Guests users are no longer supported"
