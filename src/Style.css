@@ -33,7 +33,7 @@ input, button, textarea {
     margin-top: 8px;
 }
 
-.posting button {
+.posting>button {
     width: 100px;
 }
 

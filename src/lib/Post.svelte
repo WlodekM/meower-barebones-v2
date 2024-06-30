@@ -7,6 +7,7 @@
     import Container from "@/lib/Container.svelte";
 	import FormattedDate from "./FormattedDate.svelte";
 	import { IMAGE_HOST_WHITELIST } from "./whitelist";
+	import { apiUrl } from "./urls";
     import UsernameDisplay from "@/lib/UsernameDisplay.svelte";
     import { ulist, user } from "./stores"
     export let post;
@@ -76,6 +77,8 @@
 	async function addFancyElements(content) {
 		// markdown (which has HTML escaping built-in)
 		var renderedContent;
+
+		content = content.replace(/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i, "")
 
 		try {
 			const md = new MarkdownIt("default", {
@@ -185,7 +188,7 @@
 		// 	size: 20,
 		// });
 
-		renderedContent = renderedContent.replace(/&lt;(a?):(.*?):([0-9]*?)&gt;/, "<img class=\"emoji\" src=\"https://cdn.discordapp.com/emojis/$3.webp?size=96&quality=lossless\" title=\"$2\" alt=\"$2\">")
+		renderedContent = renderedContent.replace(/&lt;(a?):(.*?):([0-9]*?)&gt;/, "<img class=\"post-emoji\" src=\"https://cdn.discordapp.com/emojis/$3.webp?size=96&quality=lossless\" title=\"$2\" alt=\"$2\">")
 
 		return renderedContent;
 	}
@@ -199,7 +202,6 @@
 					alt="{post.user}'s profile picture"
 				/>
 			{:then profile}
-				{(()=>{console.debug(post.user.avatar,post.user);return ""})()}
 				<PFP
 					icon={noPFP
 						? post.user === "Server"
@@ -272,6 +274,13 @@
 			<div class="post-time">
 				<FormattedDate date={post.date} />
 			</div>
+			{#if post.content.match(/^@\w+\s\[\w+-\w+-\w+-\w+-\w+\]\s*/i)}
+				{#await fetch(`${apiUrl}posts?id=${String(post.content).match(/^@\w+\s\[(\w+-\w+-\w+-\w+-\w+)\]\s*/i)[1]}`).then(res => res.json())}
+					<Container>Loading reply...</Container>
+				{:then post} 
+					<Container>{post.u}: {post.p}</Container>
+				{/await}
+			{/if}
 			<!-- {@html marked(post.p)} -->
 			{#await ($user.xss ? markdown : addFancyElements)(post.content) then content}
 				{@html content}
@@ -288,7 +297,7 @@
 </div>
 
 <style>
-	:global(.emoji) {
+	:global(.post-emoji) {
 		height: 1em;
 	}
 

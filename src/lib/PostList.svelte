@@ -7,6 +7,7 @@
     import Container from "./Container.svelte"
 	import { emojify } from "@/lib/emojis.js";
 	import autosize from 'svelte-autosize';
+	// import EmojiPicker from "svelte-emoji-picker";
     import { shiftHeld } from "./key.js";
 
     export let path = '/home'
@@ -161,11 +162,12 @@
     }
 
     let submitBtn
+    let txt = "";
 </script>
 {#if enablePosting}
 <div class="posting">
     <!-- style="resize: none;width:calc(100% - (11px * 2) - 100px)" -->
-    <textarea rows="2" class="type-message" bind:this={postInput} use:autosize
+    <textarea rows="2" class="type-message" bind:this={postInput} use:autosize bind:value={txt}
     on:keydown={event => {
         if (
             event.key == "Enter" &&
@@ -175,6 +177,7 @@
             if (!submitBtn.disabled) submitBtn.click();
         }
     }}></textarea>
+    <!-- <EmojiPicker bind:value={txt} /> -->
     <button id="postbutton" on:click={()=>{
 		let post = postInput.value
 		post = emojify(post)
