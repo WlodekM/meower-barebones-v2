@@ -185,6 +185,8 @@
 		// 	size: 20,
 		// });
 
+		renderedContent = renderedContent.replace(/&lt;(a?):(.*?):([0-9]*?)&gt;/, "<img class=\"emoji\" src=\"https://cdn.discordapp.com/emojis/$3.webp?size=96&quality=lossless\" title=\"$2\" alt=\"$2\">")
+
 		return renderedContent;
 	}
 </script>
@@ -286,6 +288,10 @@
 </div>
 
 <style>
+	:global(.emoji) {
+		height: 1em;
+	}
+
 	.post-header div {
 		display: inline-block;
 	}
