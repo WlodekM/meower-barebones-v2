@@ -87,13 +87,21 @@
 {/key}
 </div>
 <h2>Mixins</h2>
-{#each debug.mixins as mixin}
-    <h4>{mixin.type}</h4>
-    {mixin.function?.toString() ?? "Null"}
-{/each}
-{#if debug.mixins.length <= 0}
-    No mixins found, either your plugins r brokey or you dont use plugins (IMPOSSIBUL!11!11!?!???//)
-{/if}
+{#key debug.mixins}
+    {#each debug.mixins as mixin}
+        <h4>{mixin.type}</h4>
+        {mixin.function?.toString() ?? "Null"}
+    {/each}
+    {#if debug.mixins.length <= 0}
+        No mixins found, either your plugins r brokey or you dont use plugins (IMPOSSIBUL!11!11!?!???//)
+    {:else}
+        <button on:click={()=>{
+            debug.mixins = [];
+            //@ts-ignore
+            window.mixins = [];
+        }}>Remove mixins</button>
+    {/if}
+{/key}
 <h2>Stores</h2>
 {#each debug.stores as store}
     <h4>{store.key}</h4>

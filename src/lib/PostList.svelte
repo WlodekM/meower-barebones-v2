@@ -63,6 +63,17 @@
                         : `Notification to ${post.u}`;
             }
         }
+		//@ts-ignore
+		if (window.mixins) {
+			//@ts-ignore
+			if (!window.mixins) window.mixins = []
+			//@ts-ignore
+			window.mixins.forEach(mixin => {
+				if(mixin.type == "prePostRender") {
+					post = mixin.function(post)
+				}
+			});
+		}
         return {
             id: id++,
             post_id: post._id,

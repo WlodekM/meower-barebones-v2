@@ -139,8 +139,9 @@
 <div class="center-vert" style="height: 100vh;">
     <div class="container center" style="max-width: 400px;">
         <div class="title">
-            Login
+            Meower BareBones - Login
         </div>
+        <center>warning: this client might workn't sometimes, if it breaks, please DM @WlodekM3 on meower or @wlodekm2 on discord</center>
         <form class="form left" style="width: 100%;" id="loginForm" on:submit={async (e)=>{
             e.preventDefault();
             if (!username) return
