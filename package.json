@@ -16,6 +16,7 @@
     "vite": "^4.4.1"
   },
   "dependencies": {
+    "@meower/api-client": "npm:@jsr/meower__api-client@^1.0.0-rc.5",
     "highlight.js": "^11.9.0",
     "linkify-html": "^4.1.3",
     "linkify-plugin-mention": "^4.1.3",
