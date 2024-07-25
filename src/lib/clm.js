@@ -1,5 +1,5 @@
 import { chats, ulist, isLoggedIn, user, authHeader } from './stores.js'
-import { linkUrl } from "./urls.js";
+import { linkUrl, apiUrl } from "./urls.js";
 import { writable } from "svelte/store";
 import { tick } from "svelte"
 import Cloudlink from "./cloudlink.js";
@@ -157,7 +157,7 @@ export function connect() {
     
             // get and set chats
             await tick();
-            const resp = await fetch(`https://api.meower.org/chats?autoget=1`, {
+            const resp = await fetch(`${apiUrl}/chats?autoget=1`, {
                 headers: _authHeader,
             });
             const json = await resp.json();
@@ -190,7 +190,7 @@ export async function updateProfile(updatedValues) {
     if(updatedValues.layout) {
         updatedValues.layout = JSON.stringify(updatedValues.layout)
     }
-    const resp = await fetch(`https://api.meower.org/me/config`, {
+    const resp = await fetch(`${apiUrl}/me/config`, {
         method: 'PATCH',
         headers: {
             ..._authHeader, 
