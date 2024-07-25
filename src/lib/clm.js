@@ -190,26 +190,15 @@ export async function updateProfile(updatedValues) {
     if(updatedValues.layout) {
         updatedValues.layout = JSON.stringify(updatedValues.layout)
     }
-	return meowerRequest({
-		cmd: "direct",
-		val: {
-			cmd: "update_config",
-			val: updatedValues,
-			/*{
-				unread_inbox: profile.unread_inbox,
-				theme: profile.theme,
-				mode: profile.mode,
-				sfx: profile.sfx,
-				bgm: profile.bgm,
-				bgm_song: profile.bgm_song,
-				layout: profile.layout,
-				hide_blocked_users: profile.hide_blocked_users,
-				favorited_chats: profile.favorited_chats,
-				pfp_data: profile.pfp_data,
-				quote: profile.quote,
-			},*/
-		},
-	});
+    const resp = await fetch(`https://api.meower.org/me/config`, {
+        method: 'PATCH',
+        headers: {
+            ..._authHeader, 
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedValues)
+    })
+	return await resp.json();
 }
 
 export function sendCmd(cmd, val) {
