@@ -281,6 +281,11 @@
 					<Container>{post.u}: {post.p}</Container>
 				{/await}
 			{/if}
+			{#if post.reply_to}
+				{#each post.reply_to as reply_to}
+					<Container>{reply_to.u}: {reply_to.p}</Container>
+				{/each}
+			{/if}
 			<!-- {@html marked(post.p)} -->
 			{#await ($user.xss ? markdown : addFancyElements)(post.content) then content}
 				{@html content}

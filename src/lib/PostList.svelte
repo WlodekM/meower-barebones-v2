@@ -16,6 +16,7 @@
     export let update = true
     // export let expandUserList = false
     export let enablePosting = true
+    let postAttachments = [];
 
     let id = 0;
 
@@ -88,6 +89,7 @@
             isDeleted: post.isDeleted,
             mod_deleted: post.mod_deleted,
             deleted_at: post.deleted_at,
+            reply_to: post.reply_to
         };
 		// if ($user.hide_blocked_users) {
 		// 	// @ts-ignore
@@ -170,6 +172,121 @@
             body: JSON.stringify({content})
         }).then(response => response.text())
         postInput.value = ""
+    }
+    
+    // thanks eri for the code :>
+    //TODO - add eris to the credits
+    function addAttachment(file) {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        // const element = document.createElement('div');
+
+        const attachment = {file};
+        attachment.req = new Promise((resolve, reject) => {
+            attachment.cancel = (message) => {
+                console.error(`Failed uploading ${file.name}`, message)
+                xhr.abort();
+                // element.remove();
+                postAttachments = postAttachments.filter(item => item !== attachment);
+                reject(message);
+            };
+            postAttachments.push(attachment);
+
+            if (file.size > (50 << 20)) {
+                attachment.cancel("Files must not exceed 50MiB.");
+                return;
+            }
+
+            // element.classList.add("attach-pre-outer");
+            // element.title = file.name;
+            // if (getComputedStyle(document.documentElement).getPropertyValue('--color-scheme').trim() === 'light') {
+            //     element.classList.add(`lightpre`);
+            // }
+            // element.innerHTML = `
+            // <div class="attachment-wrapper">
+            // <div class="attachment-progress" style="--pre: 0%;">
+            // <span>0%</span>
+            // </div>
+            // <div class="attachment-name">
+            // <span>${file.name}</span>
+            // </div>
+            // <div class="delete-attach">
+            // <svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15 3.999V2H9V3.999H3V5.999H21V3.999H15Z"></path><path fill="currentColor" d="M5 6.99902V18.999C5 20.101 5.897 20.999 7 20.999H17C18.103 20.999 19 20.101 19 18.999V6.99902H5ZM11 17H9V11H11V17ZM15 17H13V11H15V17Z"></path></svg>
+            // </div>
+            // </div>
+            // `;
+            // element.querySelector(".attachment-wrapper").querySelector(".delete-attach").onclick = () => { attachment.cancel(""); };
+            if (file.type.includes("image/") && file.size < (10 << 20)) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    // const img = document.createElement("img");
+                    // img.classList.add("image-pre");
+                    // img.src = reader.result;
+                    // img.onclick = () => {
+                    //     openImage(reader.result);
+                    // };
+        
+                    // const attachmentMedia = document.createElement("div");
+                    // attachmentMedia.classList.add("attachment-media");
+                    // attachmentMedia.appendChild(img);
+
+                    // const attachmentWrapper = element.querySelector(".attachment-wrapper")
+                    // attachmentWrapper.insertBefore(attachmentMedia, attachmentWrapper.querySelector(".attachment-name"));
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // const fileType = document.createElement("span");
+                // fileType.classList.add("other-in");
+                // fileType.innerText = file.name.split('.').pop().toLowerCase();
+
+                // const otherPre = document.createElement("div");
+                // otherPre.classList.add("other-pre");
+                // otherPre.appendChild(fileType);
+
+                // const attachmentOther = document.createElement("div");
+                // attachmentOther.classList.add("attachment-other");
+                // attachmentOther.appendChild(otherPre);
+
+                // const attachmentWrapper = element.querySelector(".attachment-wrapper")
+                // attachmentWrapper.insertBefore(attachmentOther, attachmentWrapper.querySelector(".attachment-name"));
+            }
+            
+            // document.getElementById('images-container').appendChild(element);
+
+            xhr.open("POST", "https://uploads.meower.org/attachments");
+            xhr.setRequestHeader("Authorization", localStorage.getItem("token"));
+            xhr.upload.onprogress = (ev) => {
+                const percentage = `${Number((ev.loaded / ev.total) * 100).toFixed(2)}%`;
+                // element.querySelector(".attachment-progress").style.setProperty('--pre', `${percentage}`);
+                // element.querySelector(".attachment-progress span").innerText = `${percentage}`;
+            };
+            xhr.onload = () => {
+                // element.querySelector(".attachment-progress").style.setProperty('--pre', `0`);
+                // const attachmentProgress = element.querySelector(".attachment-progress").querySelector("span");
+                // attachmentProgress.remove();
+
+                resolve(JSON.parse(xhr.response));
+            };
+            xhr.onerror = (error) => {
+                attachment.cancel(error);
+            };
+            formData.append("file", file);
+            xhr.send(formData);
+        });
+    }
+
+    function selectFiles() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.click();
+        postAttachments = [];
+        input.onchange = function(e) {
+            //@ts-ignore
+            for (const file of e.target.files) {
+                addAttachment(file);
+            }
+        };
     }
 
     let submitBtn

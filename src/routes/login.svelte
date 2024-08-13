@@ -12,47 +12,73 @@
         status = "Logging in"
         localStorage.setItem("meower_savedusername", username);
         localStorage.setItem("meower_savedpassword", password);
-        try {
-            await meowerRequest({
-            "cmd": "direct",
-            "val": {
-                cmd: "authpswd",
-                val: {
-                    "username": username,
-                    "pswd": password,
-                },
-            }
-        })
-        } catch (statusCode) {
-            switch (statusCode) {
-                case "E:103 | ID not found":
-                    status = "Invalid username!";
-                    return;
-                case "E:025 | Deleted":
-                    status = "This account has been deleted!";
-                    return;
-                case "I:011 | Invalid Password":
-                    status = "Invalid password!";
-                    return;
-                case "E:018 | Account Banned":
-                    status = "";
-                    return;
-                case "E:019 | Illegal characters detected":
-                    status =
-                        "Usernames must not have spaces or other special characters!";
-                    return;
-                case "E:106 | Too many requests":
-                    status = "Too many requests! Please try again later.";
-                    return;
+        // try {
+        //     await meowerRequest({
+        //     "cmd": "direct",
+        //     "val": {
+        //         cmd: "authpswd",
+        //         val: {
+        //             "username": username,
+        //             "pswd": password,
+        //         },
+        //     }
+        // })
+        // } catch (statusCode) {
+        //     switch (statusCode) {
+        //         case "E:103 | ID not found":
+        //             status = "Invalid username!";
+        //             return;
+        //         case "E:025 | Deleted":
+        //             status = "This account has been deleted!";
+        //             return;
+        //         case "I:011 | Invalid Password":
+        //             status = "Invalid password!";
+        //             return;
+        //         case "E:018 | Account Banned":
+        //             status = "";
+        //             return;
+        //         case "E:019 | Illegal characters detected":
+        //             status =
+        //                 "Usernames must not have spaces or other special characters!";
+        //             return;
+        //         case "E:106 | Too many requests":
+        //             status = "Too many requests! Please try again later.";
+        //             return;
+        //         default:
+        //             status = `Uncaught  error!`
+        //     }
+        // }
+        let res = await fetch(`${apiUrl}/auth/login/`, {
+			"method":"POST",
+			"headers": {
+				"content-type": "application/json"
+			},
+			"body": JSON.stringify({
+				"username":username,
+				"password":password
+			})
+		})
+
+        const json = await res.json()
+
+        if(!res.ok) {
+            switch (json.type) {
+                case 'mfaRequired':
+                    status = `This account requires MFA!\nSorry Meower BareBones doesn't currently support MFA login.`;
+                    break;
+            
                 default:
-                    status = `Uncaught  error!`
+                    status = `Uncaught error!`;
+                    break;
             }
+            return;
         }
-        let res = await fetch(`${apiUrl}/users/${username}`,
-        {
-            headers: $authHeader,
-        })
-        const json = await res.json() ?? {
+
+        $authHeader = {
+            token: json.token,
+            username: json.account._id,
+        }
+        const accData = json.account ?? {
             name: null,
             flags: 0,
             permissions: 0,
@@ -77,8 +103,8 @@
             whitelist_enabled: true,
             layout: {css: ""}
         }
-        if(!json.name && json._id) {
-            json.name = json._id
+        if(!accData.name && accData._id) {
+            accData.name = accData._id
         }
         function isJsonString(str) {
             try {
@@ -88,12 +114,12 @@
             }
             return true;
         }
-        if(isJsonString(json.layout)) {
-            json.layout = JSON.parse(json.layout)
+        if(isJsonString(accData.layout)) {
+            accData.layout = JSON.parse(accData.layout)
         } else {
-            json.layout = {css: ""}
+            accData.layout = {css: ""}
         }
-        $user = json
+        $user = accData
         //@ts-ignore
         if (window.mixins) {
             //@ts-ignore
