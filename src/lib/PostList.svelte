@@ -89,7 +89,8 @@
             isDeleted: post.isDeleted,
             mod_deleted: post.mod_deleted,
             deleted_at: post.deleted_at,
-            reply_to: post.reply_to
+            reply_to: post.reply_to,
+            author: post.author,
         };
 		// if ($user.hide_blocked_users) {
 		// 	// @ts-ignore

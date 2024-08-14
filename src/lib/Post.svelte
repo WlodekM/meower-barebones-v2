@@ -3,7 +3,7 @@
 	import MarkdownIt from "markdown-it";
     import hljs from "highlight.js";
 	import PFP from './PFP.svelte'
-	import loadProfile from "./loadProfile.js";
+	// import loadProfile from "./loadProfile.js";
     import Container from "@/lib/Container.svelte";
 	import FormattedDate from "./FormattedDate.svelte";
 	import { IMAGE_HOST_WHITELIST } from "./whitelist";
@@ -196,32 +196,20 @@
 <div class="post container">
 	<div class="flex-row">
 		<div class="post-pfp">
-			{#await noPFP ? Promise.resolve(true) : loadProfile(post.user)}
-				<PFP
-					icon={-2}
-					alt="{post.user}'s profile picture"
-				/>
-			{:then profile}
-				<PFP
-					icon={noPFP
-						? post.user === "Server"
-							? 102
-							: post.post_origin === "inbox" &&
-							  (post.user === "Announcement" ||
-									post.user === "Notification" ||
-									post.user.startsWith("Notification to"))
-							? 101
-							: -2
-						: profile.pfp_data}
-					avatar={profile.avatar}
-					alt="{post.user}'s profile picture"
-				/>
-			{:catch}
-				<PFP
-					icon={-2}
-					alt="{post.user}'s profile picture"
-				/>
-			{/await}
+			<PFP
+				icon={noPFP
+					? post.user === "Server"
+						? 102
+						: post.post_origin === "inbox" &&
+							(post.user === "Announcement" ||
+								post.user === "Notification" ||
+								post.user.startsWith("Notification to"))
+						? 101
+						: -2
+					: post.author.pfp_data}
+				avatar={post.author.avatar}
+				alt="{post.user}'s profile picture"
+			/>
 		</div>
 		<div class="post-content">
 			<div class="post-header" style="width: 100%;">
